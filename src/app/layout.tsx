@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'InstaBoost AI',
-  description: 'Gere legendas, hashtags e prompts para o Instagram com IA.',
+  title: 'PostIA',
+  description: 'Gere legendas, hashtags e prompts para seus posts com IA.',
 };
 
 export default function RootLayout({

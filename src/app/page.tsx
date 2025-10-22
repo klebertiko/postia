@@ -6,7 +6,7 @@ import { GeneratedContent } from '@/components/generated-content';
 import type { GeneratedContent as GeneratedContentType } from '@/lib/types';
 import { generateContentAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Icons } from '@/components/icons';
+import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type FormValues = {
@@ -43,13 +43,13 @@ export default function Home() {
         <div className="mx-auto max-w-3xl">
           <header className="text-center mb-8 md:mb-12">
             <div className="inline-flex items-center gap-4 mb-4">
-              <Icons.logo className="h-12 w-12 text-primary" />
+              <PenSquare className="h-12 w-12 text-primary" />
               <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-primary">
-                InstaBoost AI
+                PostIA
               </h1>
             </div>
             <p className="text-muted-foreground text-lg">
-              Eleve seu Instagram a outro nível. Gere legendas, hashtags e
+              Eleve seu conteúdo a outro nível. Gere legendas, hashtags e
               prompts de imagem com o poder da IA.
             </p>
           </header>
@@ -63,7 +63,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="py-6 text-center text-muted-foreground text-sm">
-        <p>&copy; {new Date().getFullYear()} InstaBoost AI. Todos os direitos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} PostIA. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
