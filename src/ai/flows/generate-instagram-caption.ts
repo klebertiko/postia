@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for generating Instagram captions based on a user-provided image description.
+ * @fileOverview This file defines a Genkit flow for generating Instagram captions based on a user-provided post topic.
  *
  * - generateInstagramCaption - A function that generates an Instagram caption.
  * - GenerateInstagramCaptionInput - The input type for the generateInstagramCaption function.
@@ -12,9 +12,9 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateInstagramCaptionInputSchema = z.object({
-  imageDescription: z
+  postTopic: z
     .string()
-    .describe('A description of the image for which to generate a caption.'),
+    .describe('The topic of the post for which to generate a caption.'),
 });
 
 export type GenerateInstagramCaptionInput = z.infer<
@@ -25,7 +25,7 @@ const GenerateInstagramCaptionOutputSchema = z.object({
   caption: z
     .string()
     .describe(
-      'A relevant and engaging caption for the image, within Instagrams character limit.'
+      'A relevant and engaging caption for the post, within Instagrams character limit.'
     ),
 });
 
@@ -43,9 +43,9 @@ const prompt = ai.definePrompt({
   name: 'generateInstagramCaptionPrompt',
   input: {schema: GenerateInstagramCaptionInputSchema},
   output: {schema: GenerateInstagramCaptionOutputSchema},
-  prompt: `You are an expert social media manager. Generate an engaging and relevant Instagram caption based on the following image description. Keep the caption under Instagram's character limit.
+  prompt: `You are a social media marketing specialist for Instagram. Generate an engaging and relevant Instagram caption based on the following post topic. Keep the caption under Instagram's character limit.
 
-Image Description: {{{imageDescription}}}`,
+Post Topic: {{{postTopic}}}`,
 });
 
 const generateInstagramCaptionFlow = ai.defineFlow(

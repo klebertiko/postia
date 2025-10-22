@@ -10,9 +10,7 @@ import { Icons } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type FormValues = {
-  imageDescription: string;
-  postTheme?: string;
-  instagramTrends?: string;
+  postTopic: string;
 };
 
 export default function Home() {

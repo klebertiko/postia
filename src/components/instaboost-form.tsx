@@ -14,23 +14,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Wand2 } from 'lucide-react';
 
 const formSchema = z.object({
-  imageDescription: z
-    .string({ required_error: 'A descrição da imagem é obrigatória.' })
-    .min(10, { message: 'A descrição deve ter pelo menos 10 caracteres.' })
-    .max(1000, { message: 'A descrição não pode ter mais de 1000 caracteres.' }),
-  postTheme: z
-    .string()
-    .max(100, { message: 'O tema não pode ter mais de 100 caracteres.' })
-    .optional(),
-  instagramTrends: z
-    .string()
-    .max(500, { message: 'As tendências não podem ter mais de 500 caracteres.' })
-    .optional(),
+  postTopic: z
+    .string({ required_error: 'O tópico do post é obrigatório.' })
+    .min(5, { message: 'O tópico deve ter pelo menos 5 caracteres.' })
+    .max(200, { message: 'O tópico não pode ter mais de 200 caracteres.' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -44,9 +35,7 @@ export function InstaBoostForm({ onSubmit, isLoading }: InstaBoostFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      imageDescription: '',
-      postTheme: '',
-      instagramTrends: '',
+      postTopic: '',
     },
   });
 
@@ -60,54 +49,18 @@ export function InstaBoostForm({ onSubmit, isLoading }: InstaBoostFormProps) {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="imageDescription"
+              name="postTopic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição da Imagem</FormLabel>
+                  <FormLabel>Tópico do Post</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Ex: um cachorro golden retriever sorrindo em uma praia ensolarada"
+                    <Input
+                      placeholder="Ex: Dicas para uma viagem à Itália"
                       {...field}
-                      rows={4}
                     />
                   </FormControl>
                   <FormDescription>
-                    Descreva em detalhes o que está na sua imagem ou o que você quer gerar.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="postTheme"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tema da Postagem (Opcional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Férias de verão, Dicas de viagem" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="instagramTrends"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tendências do Instagram (Opcional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Ex: Cores vibrantes, estética minimalista, vídeos curtos"
-                      {...field}
-                      rows={2}
-                    />
-                  </FormControl>
-                   <FormDescription>
-                    Adicione tendências para otimizar o prompt de geração de imagem.
+                    Insira o tema central do seu post para a IA gerar o conteúdo.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

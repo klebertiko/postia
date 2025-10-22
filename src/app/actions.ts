@@ -7,9 +7,7 @@ import { z } from 'zod';
 import type { GeneratedContent } from '@/lib/types';
 
 const formSchema = z.object({
-  imageDescription: z.string().min(1, 'A descrição da imagem é obrigatória.'),
-  postTheme: z.string().optional(),
-  instagramTrends: z.string().optional(),
+  postTopic: z.string().min(1, 'O tópico do post é obrigatório.'),
 });
 
 export async function generateContentAction(
@@ -21,17 +19,13 @@ export async function generateContentAction(
     return { data: null, error: 'Dados de entrada inválidos.' };
   }
   
-  const { imageDescription, postTheme, instagramTrends } = validation.data;
-
-  const fullDescription = postTheme 
-    ? `${imageDescription} (Tema da postagem: ${postTheme})` 
-    : imageDescription;
+  const { postTopic } = validation.data;
 
   try {
     const [captionResult, hashtagsResult, promptResult] = await Promise.all([
-      generateInstagramCaption({ imageDescription: fullDescription }),
-      suggestRelevantHashtags({ imageDescription: fullDescription }),
-      generateGeminiNanoPrompt({ imageDescription: fullDescription, instagramTrends: instagramTrends || 'tendências atuais do Instagram' }),
+      generateInstagramCaption({ postTopic }),
+      suggestRelevantHashtags({ postTopic }),
+      generateGeminiNanoPrompt({ postTopic }),
     ]);
 
     if (!captionResult?.caption || !hashtagsResult?.hashtags || !promptResult?.prompt) {

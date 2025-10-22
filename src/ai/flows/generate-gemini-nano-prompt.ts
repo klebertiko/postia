@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview A flow that generates an optimized prompt for image generation with Gemini Nano based on a user-provided image description.
+ * @fileOverview A flow that generates an optimized prompt for image generation based on a user-provided post topic.
  *
  * - generateGeminiNanoPrompt - A function that generates the prompt.
  * - GenerateGeminiNanoPromptInput - The input type for the generateGeminiNanoPrompt function.
@@ -11,20 +11,18 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateGeminiNanoPromptInputSchema = z.object({
-  imageDescription: z
+  postTopic: z
     .string()
-    .describe('A description of the image to be generated.'),
-  instagramTrends: z
-    .string()
-    .optional()
-    .describe('Optional information on current Instagram trends.'),
+    .describe('The topic of the post for which to generate an image prompt.'),
 });
 export type GenerateGeminiNanoPromptInput = z.infer<
   typeof GenerateGeminiNanoPromptInputSchema
 >;
 
 const GenerateGeminiNanoPromptOutputSchema = z.object({
-  prompt: z.string().describe('The optimized prompt for Gemini Nano.'),
+  prompt: z
+    .string()
+    .describe('The optimized prompt for image generation.'),
 });
 export type GenerateGeminiNanoPromptOutput = z.infer<
   typeof GenerateGeminiNanoPromptOutputSchema
@@ -40,15 +38,13 @@ const prompt = ai.definePrompt({
   name: 'generateGeminiNanoPromptPrompt',
   input: {schema: GenerateGeminiNanoPromptInputSchema},
   output: {schema: GenerateGeminiNanoPromptOutputSchema},
-  prompt: `You are an expert prompt engineer for the Gemini Nano image generation model.
+  prompt: `You are an expert in image prompt engineering for Instagram.
 
-  Your goal is to create a highly effective prompt based on the user's description of the desired image.
-  Consider current Instagram trends if provided to enhance the prompt's relevance and engagement potential.
+  Your goal is to create a highly effective prompt for image generation based on the user's post topic.
 
-  Image Description: {{{imageDescription}}}
-  Instagram Trends (optional): {{{instagramTrends}}}
+  Post Topic: {{{postTopic}}}
 
-  Generate a concise and creative prompt that captures the essence of the description and is optimized for Gemini Nano. The prompt should not exceed 200 characters.
+  Generate a concise and creative prompt that captures the essence of the topic and is optimized for creating a visually appealing Instagram post. The prompt should not exceed 200 characters.
   `,
 });
 
