@@ -2,7 +2,7 @@
 
 Bem-vindo ao PostIA! Este projeto é uma aplicação web completa, construída com Next.js e Genkit, projetada para atuar como um assistente de marketing de mídia social. Com o poder da IA generativa do Google, o PostIA gera legendas, hashtags relevantes e prompts de imagem detalhados, tudo a partir de um único tópico.
 
-Este `README` irá guiá-lo para configurar e executar o projeto em seu ambiente local.
+Este `README` irá guiá-lo para configurar, executar e fazer o deploy do projeto.
 
 ![Demonstração do PostIA](https://storage.googleapis.com/static.aifirebase.dev/project-wizards/instaboost-ai.gif)
 
@@ -24,6 +24,7 @@ Este `README` irá guiá-lo para configurar e executar o projeto em seu ambiente
 -   **Formulários:** [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)
 -   **Ícones:** [Lucide React](https://lucide.dev/guide/packages/lucide-react)
 -   **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
+-   **Deploy:** [Vercel](https://vercel.com/)
 
 ## ⚙️ Configuração e Execução Local
 
@@ -33,6 +34,7 @@ Siga os passos abaixo para ter uma cópia do PostIA rodando em sua máquina.
 
 -   [Node.js](https://nodejs.org/) (versão 18 ou superior)
 -   [npm](https://www.npmjs.com/) (geralmente instalado com o Node.js)
+-   [Git](https://git-scm.com/)
 
 ### 2. Obtenha uma Chave de API do Gemini
 
@@ -56,32 +58,45 @@ Para que a IA funcione, você precisa de uma chave de API do Google Gemini.
     ```
 
 3.  **Crie o arquivo de ambiente:**
-    Renomeie o arquivo `.env.example` (se houver) para `.env` ou crie um novo arquivo `.env` na raiz do projeto e adicione sua chave de API:
-
+    Crie um novo arquivo chamado `.env` na raiz do projeto e adicione sua chave de API:
     ```.env
     GEMINI_API_KEY=SUA_CHAVE_DE_API_AQUI
     ```
     Substitua `SUA_CHAVE_DE_API_AQUI` pela chave que você obteve no Google AI Studio.
 
-### 4. Execute a Aplicação
+### 4. Execute a Aplicação Localmente
 
-O projeto usa dois servidores de desenvolvimento que precisam rodar simultaneamente: um para a aplicação Next.js (frontend) e outro para o Genkit (backend de IA).
+A aplicação Next.js já inclui os fluxos de IA como Server Actions, então você só precisa de um comando para rodar tudo.
 
-1.  **Inicie o servidor do Next.js:**
-    Abra um terminal e execute:
-    ```bash
-    npm run dev
-    ```
-    Isso iniciará a aplicação em `http://localhost:9002`.
-
-2.  **Inicie o servidor do Genkit:**
-    Abra um **novo terminal** e execute:
-    ```bash
-    npm run genkit:watch
-    ```
-    Isso inicia o servidor Genkit, que expõe os fluxos de IA para a aplicação Next.js. O comando `genkit:watch` monitora as alterações nos arquivos de fluxo e reinicia o servidor automaticamente.
+```bash
+npm run dev
+```
 
 Agora, acesse `http://localhost:9002` em seu navegador para ver o PostIA em ação!
+
+## 🚀 Deploy na Vercel
+
+Fazer o deploy do PostIA é um processo simples com a Vercel.
+
+### 1. Crie uma Conta e Conecte seu Git
+
+1.  Crie uma conta gratuita na [Vercel](https://vercel.com/signup).
+2.  Faça o upload do seu projeto para um repositório no GitHub, GitLab ou Bitbucket.
+3.  Na Vercel, clique em "**Add New...**" -> "**Project**".
+4.  Importe o repositório do seu projeto.
+
+### 2. Configure o Projeto
+
+A Vercel detectará automaticamente que é um projeto Next.js e usará as configurações corretas. A única etapa manual é configurar a variável de ambiente.
+
+1.  Dentro das configurações do seu projeto na Vercel, vá para a aba "**Settings**" -> "**Environment Variables**".
+2.  Adicione uma nova variável de ambiente:
+    -   **Name:** `GEMINI_API_KEY`
+    -   **Value:** Cole a chave de API que você obteve do Google AI Studio.
+3.  Certifique-se de que a variável **não esteja** marcada como "Exposed to the client". Ela deve ser usada apenas no lado do servidor.
+4.  Salve e clique em "**Deploy**".
+
+A Vercel cuidará de todo o processo de build e deploy. Em poucos minutos, seu PostIA estará online e acessível globalmente!
 
 ## 📚 Quer Aprender Mais?
 
