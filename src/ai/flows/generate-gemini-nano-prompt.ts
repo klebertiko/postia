@@ -51,6 +51,7 @@ Gere um prompt conciso e criativo que capture a essência do tópico e seja otim
     });
 
     // Retorna o resultado no formato definido pelo `outputSchema`.
-    return { imagePrompt: text() };
+    // CORREÇÃO: Usar `text` diretamente em vez de `text()`.
+    return { imagePrompt: text };
   }
 );

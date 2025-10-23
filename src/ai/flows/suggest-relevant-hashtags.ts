@@ -50,6 +50,7 @@ Tópico da postagem: ${input.topic}`,
     });
 
     // Retorna o resultado no formato definido pelo `outputSchema`.
-    return result.output()!;
+    // CORREÇÃO: Usar `result.output` em vez de `result.output()`.
+    return result.output!;
   }
 );

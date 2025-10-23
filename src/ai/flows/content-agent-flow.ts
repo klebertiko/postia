@@ -82,6 +82,7 @@ Tópico do Post: ${input.postTopic}`;
     });
 
     // Retorna a saída final estruturada, que o modelo montou após usar as ferramentas.
-    return result.output()!;
+    // CORREÇÃO: Usar `result.output` em vez de `result.output()`.
+    return result.output!;
   }
 );
