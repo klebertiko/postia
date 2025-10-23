@@ -1,10 +1,8 @@
 'use server';
 
-import { generateInstagramCaption } from '@/ai/flows/generate-instagram-caption';
-import { suggestRelevantHashtags } from '@/ai/flows/suggest-relevant-hashtags';
-import { generateGeminiNanoPrompt } from '@/ai/flows/generate-gemini-nano-prompt';
 import { z } from 'zod';
 import type { GeneratedContent } from '@/lib/types';
+import { generatePostContent } from '@/ai/flows/content-agent-flow';
 
 const formSchema = z.object({
   postTopic: z.string().min(1, 'O tópico do post é obrigatório.'),
@@ -22,21 +20,19 @@ export async function generateContentAction(
   const { postTopic } = validation.data;
 
   try {
-    const [captionResult, hashtagsResult, promptResult] = await Promise.all([
-      generateInstagramCaption({ postTopic }),
-      suggestRelevantHashtags({ postTopic }),
-      generateGeminiNanoPrompt({ postTopic }),
-    ]);
+    // Agora, chamamos apenas o fluxo principal do agente orquestrador.
+    // Ele cuidará de chamar os outros agentes para gerar o conteúdo.
+    const result = await generatePostContent({ postTopic });
 
-    if (!captionResult?.caption || !hashtagsResult?.hashtags || !promptResult?.prompt) {
+    if (!result?.caption || !result?.hashtags || !result?.imagePrompt) {
         throw new Error('A IA não conseguiu gerar todo o conteúdo.');
     }
 
     return {
       data: {
-        caption: captionResult.caption,
-        hashtags: hashtagsResult.hashtags.slice(0, 15), // Limit hashtags
-        prompt: promptResult.prompt,
+        caption: result.caption,
+        hashtags: result.hashtags.slice(0, 15), // Limita as hashtags
+        prompt: result.imagePrompt,
       },
       error: null,
     };

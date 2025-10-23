@@ -1,61 +1,55 @@
 'use server';
 
 /**
- * @fileOverview Este arquivo define um fluxo Genkit para gerar legendas do Instagram com base em um tópico de postagem fornecido pelo usuário.
+ * @fileOverview Ferramenta de IA (agente) especializada em criar legendas para o Instagram.
  *
- * - generateInstagramCaption - Uma função que gera uma legenda para o Instagram.
- * - GenerateInstagramCaptionInput - O tipo de entrada para a função generateInstagramCaption.
- * - GenerateInstagramCaptionOutput - O tipo de retorno da função generateInstagramCaption.
+ * Este arquivo define uma "ferramenta" que o agente principal pode usar.
+ * Esta ferramenta recebe um tópico e retorna uma legenda de post envolvente.
+ *
+ * - captionGeneratorTool - A ferramenta que pode ser chamada por outros agentes.
  */
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const GenerateInstagramCaptionInputSchema = z.object({
-  postTopic: z
+// Esquema de entrada para a ferramenta: o tópico do post.
+const CaptionInputSchema = z.object({
+  topic: z
     .string()
-    .describe('O tópico do post para o qual gerar uma legenda.'),
+    .describe('O tópico para o qual a legenda deve ser criada.'),
 });
 
-export type GenerateInstagramCaptionInput = z.infer<
-  typeof GenerateInstagramCaptionInputSchema
->;
-
-const GenerateInstagramCaptionOutputSchema = z.object({
+// Esquema de saída da ferramenta: a legenda gerada.
+const CaptionOutputSchema = z.object({
   caption: z
     .string()
-    .describe(
-      'Uma legenda relevante e envolvente para o post, dentro do limite de caracteres do Instagram.'
-    ),
+    .describe('A legenda do Instagram gerada para o tópico fornecido.'),
 });
 
-export type GenerateInstagramCaptionOutput = z.infer<
-  typeof GenerateInstagramCaptionOutputSchema
->;
-
-export async function generateInstagramCaption(
-  input: GenerateInstagramCaptionInput
-): Promise<GenerateInstagramCaptionOutput> {
-  return generateInstagramCaptionFlow(input);
-}
-
-const prompt = ai.definePrompt({
-  name: 'generateInstagramCaptionPrompt',
-  input: {schema: GenerateInstagramCaptionInputSchema},
-  output: {schema: GenerateInstagramCaptionOutputSchema},
-  prompt: `Você é um especialista em marketing de mídia social para o Instagram. Gere uma legenda envolvente e relevante para o Instagram com base no seguinte tópico de postagem. Mantenha a legenda abaixo do limite de caracteres do Instagram. Não inclua hashtags na legenda. A legenda deve terminar com uma chamada para ação (CTA) clara e relevante para o tópico.
-
-Tópico da postagem: {{{postTopic}}}`,
-});
-
-const generateInstagramCaptionFlow = ai.defineFlow(
+// Definimos a ferramenta usando `ai.defineTool`.
+// Esta é a unidade de trabalho que nosso agente principal irá acionar.
+export const captionGeneratorTool = ai.defineTool(
   {
-    name: 'generateInstagramCaptionFlow',
-    inputSchema: GenerateInstagramCaptionInputSchema,
-    outputSchema: GenerateInstagramCaptionOutputSchema,
+    name: 'captionGenerator',
+    description:
+      'Gera uma legenda de postagem do Instagram envolvente com base em um tópico. A legenda não deve conter hashtags e deve terminar com uma chamada para ação (CTA) relevante.',
+    inputSchema: CaptionInputSchema,
+    outputSchema: CaptionOutputSchema,
   },
+  // A função assíncrona que executa a lógica da ferramenta.
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    // Define o prompt que será enviado ao modelo de IA.
+    const prompt = `Você é um especialista em marketing de mídia social para o Instagram.
+Gere uma legenda envolvente e relevante para o Instagram com base no seguinte tópico de postagem. Mantenha a legenda abaixo do limite de caracteres do Instagram.
+NÃO inclua hashtags na legenda. A legenda DEVE terminar com uma chamada para ação (CTA) clara e relevante para o tópico.
+
+Tópico da postagem: ${input.topic}`;
+
+    // Chama o modelo de IA com o prompt.
+    const { text } = await ai.generate({
+      prompt: prompt,
+    });
+    
+    // Retorna o resultado no formato definido pelo `outputSchema`.
+    return { caption: text() };
   }
 );

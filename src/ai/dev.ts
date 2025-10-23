@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/generate-gemini-nano-prompt.ts';
-import '@/ai/flows/generate-instagram-caption.ts';
-import '@/ai/flows/suggest-relevant-hashtags.ts';
+// Importamos o novo fluxo do agente principal.
+// Os outros fluxos não precisam mais ser importados aqui pois são usados como ferramentas.
+import '@/ai/flows/content-agent-flow.ts';

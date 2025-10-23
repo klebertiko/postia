@@ -1,61 +1,56 @@
 'use server';
 /**
- * @fileOverview Um fluxo que gera um prompt otimizado para geração de imagem com base em um tópico de postagem fornecido pelo usuário.
+ * @fileOverview Ferramenta de IA (agente) especializada em criar prompts para geração de imagem.
  *
- * - generateGeminiNanoPrompt - Uma função que gera o prompt.
- * - GenerateGeminiNanoPromptInput - O tipo de entrada para a função generateGeminiNanoPrompt.
- * - GenerateGeminiNanoPromptOutput - O tipo de retorno para a função generateGeminiNanoPrompt.
+ * Este arquivo define uma "ferramenta" que o agente principal pode usar.
+ * Esta ferramenta recebe um tópico e retorna um prompt de imagem otimizado.
+ *
+ * - imagePromptGeneratorTool - A ferramenta que pode ser chamada por outros agentes.
  */
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const GenerateGeminiNanoPromptInputSchema = z.object({
-  postTopic: z
+// Esquema de entrada para a ferramenta: o tópico do post.
+const ImagePromptInputSchema = z.object({
+  topic: z
     .string()
-    .describe('O tópico do post para o qual gerar um prompt de imagem.'),
+    .describe('O tópico para o qual o prompt de imagem deve ser criado.'),
 });
-export type GenerateGeminiNanoPromptInput = z.infer<
-  typeof GenerateGeminiNanoPromptInputSchema
->;
 
-const GenerateGeminiNanoPromptOutputSchema = z.object({
-  prompt: z
+// Esquema de saída da ferramenta: o prompt de imagem gerado.
+const ImagePromptOutputSchema = z.object({
+  imagePrompt: z
     .string()
-    .describe('O prompt otimizado para geração de imagem.'),
-});
-export type GenerateGeminiNanoPromptOutput = z.infer<
-  typeof GenerateGeminiNanoPromptOutputSchema
->;
-
-export async function generateGeminiNanoPrompt(
-  input: GenerateGeminiNanoPromptInput
-): Promise<GenerateGeminiNanoPromptOutput> {
-  return generateGeminiNanoPromptFlow(input);
-}
-
-const prompt = ai.definePrompt({
-  name: 'generateGeminiNanoPromptPrompt',
-  input: {schema: GenerateGeminiNanoPromptInputSchema},
-  output: {schema: GenerateGeminiNanoPromptOutputSchema},
-  prompt: `Você é um especialista em engenharia de prompts de imagem para o Instagram.
-
-  Seu objetivo é criar um prompt altamente eficaz para a geração de imagens com base no tópico do post do usuário.
-
-  Tópico do Post: {{{postTopic}}}
-
-  Gere um prompt conciso e criativo que capture a essência do tópico e seja otimizado para criar um post visualmente atraente no Instagram. O prompt não deve exceder 200 caracteres.
-  `,
+    .describe('O prompt de imagem otimizado para o tópico fornecido.'),
 });
 
-const generateGeminiNanoPromptFlow = ai.defineFlow(
+// Definimos a ferramenta usando `ai.defineTool`.
+// Esta é a unidade de trabalho que nosso agente principal irá acionar.
+export const imagePromptGeneratorTool = ai.defineTool(
   {
-    name: 'generateGeminiNanoPromptFlow',
-    inputSchema: GenerateGeminiNanoPromptInputSchema,
-    outputSchema: GenerateGeminiNanoPromptOutputSchema,
+    name: 'imagePromptGenerator',
+    description:
+      'Gera um prompt de imagem otimizado para o Instagram com base em um tópico de postagem. Use esta ferramenta para obter um prompt criativo para a geração de imagens.',
+    inputSchema: ImagePromptInputSchema,
+    outputSchema: ImagePromptOutputSchema,
   },
+  // A função assíncrona que executa a lógica da ferramenta.
+  // Ela usa um prompt do Genkit para chamar o modelo de IA.
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    // Define o prompt que será enviado ao modelo de IA.
+    const prompt = `Você é um especialista em engenharia de prompts de imagem para o Instagram.
+Sua tarefa é criar um prompt de imagem altamente eficaz com base no tópico do post do usuário.
+
+Tópico do Post: ${input.topic}
+
+Gere um prompt conciso e criativo que capture a essência do tópico e seja otimizado para criar um post visualmente atraente no Instagram. O prompt não deve exceder 200 caracteres.`;
+
+    // Chama o modelo de IA com o prompt.
+    const { text } = await ai.generate({
+      prompt: prompt,
+    });
+
+    // Retorna o resultado no formato definido pelo `outputSchema`.
+    return { imagePrompt: text() };
   }
 );
