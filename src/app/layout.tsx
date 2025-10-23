@@ -1,11 +1,34 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
+const APP_NAME = "PostIA";
+const APP_DEFAULT_TITLE = "PostIA";
+const APP_TITLE_TEMPLATE = "%s - PostIA";
+const APP_DESCRIPTION = "Gere legendas, hashtags e prompts para seus posts com IA.";
+
 export const metadata: Metadata = {
-  title: 'PostIA',
-  description: 'Gere legendas, hashtags e prompts para seus posts com IA.',
+  applicationName: APP_NAME,
+  title: {
+    default: APP_DEFAULT_TITLE,
+    template: APP_TITLE_TEMPLATE,
+  },
+  description: APP_DESCRIPTION,
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_DEFAULT_TITLE,
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
+
+export const viewport: Viewport = {
+  themeColor: "#211333",
+};
+
 
 export default function RootLayout({
   children,

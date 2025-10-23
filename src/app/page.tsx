@@ -39,16 +39,16 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <main className="flex-1 container mx-auto px-4 py-8 md:py-12">
-        <div className="mx-auto max-w-3xl">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="mx-auto max-w-4xl 2xl:max-w-7xl">
           <header className="text-center mb-8 md:mb-12">
             <div className="inline-flex items-center gap-4 mb-4">
-              <PenSquare className="h-12 w-12 text-primary" />
-              <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-primary">
+              <PenSquare className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
+              <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-primary">
                 PostIA
               </h1>
             </div>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-base sm:text-lg md:text-xl">
               Eleve seu conteúdo a outro nível. Gere legendas, hashtags e
               prompts de imagem com o poder da IA.
             </p>
