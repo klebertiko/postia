@@ -53,7 +53,7 @@ Estruture sua resposta seguindo as diretrizes abaixo:
 
 **Tópico do Post:** ${input.topic}
 
-Gere o prompt final em uma única linha de texto, separando os conceitos por vírgulas.`;
+Gere o prompt final em uma única linha de texto, em português do Brasil, separando os conceitos por vírgulas.`;
 
     // Chama o modelo de IA com o prompt.
     const { text } = await ai.generate({
