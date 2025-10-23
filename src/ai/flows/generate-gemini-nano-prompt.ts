@@ -38,12 +38,22 @@ export const imagePromptGeneratorTool = ai.defineTool(
   // Ela usa um prompt do Genkit para chamar o modelo de IA.
   async input => {
     // Define o prompt que será enviado ao modelo de IA.
-    const prompt = `Você é um especialista em engenharia de prompts de imagem para o Instagram.
-Sua tarefa é criar um prompt de imagem altamente eficaz com base no tópico do post do usuário.
+    const prompt = `Você é um Engenheiro de Prompt Sênior especialista em gerar imagens para mídias sociais.
+Sua tarefa é criar um prompt detalhado e estruturado para o modelo de imagem, baseado em um tópico.
+O prompt deve ser otimizado para criar uma imagem visualmente impactante, profissional e adequada para o Instagram.
 
-Tópico do Post: ${input.topic}
+Estruture sua resposta seguindo as diretrizes abaixo:
+1.  **Assunto Principal:** Descreva a cena central de forma clara e objetiva.
+2.  **Estilo e Atmosfera:** Especifique o estilo (ex: foto realista, cinematográfico, minimalista) e a atmosfera (ex: acolhedor, clínico, vibrante).
+3.  **Iluminação:** Detalhe a iluminação (ex: luz natural suave, iluminação de estúdio dramática).
+4.  **Cores e Paleta:** Sugira uma paleta de cores (ex: tons pastéis, cores vibrantes, monocromático).
+5.  **Composição:** Indique o enquadramento (ex: close-up, plano médio, vista de cima).
+6.  **Detalhes Adicionais:** Adicione elementos que enriqueçam a cena, se aplicável.
+7.  **Negativos:** (Opcional) Liste elementos a serem evitados.
 
-Gere um prompt conciso e criativo que capture a essência do tópico e seja otimizado para criar um post visualmente atraente no Instagram. O prompt não deve exceder 200 caracteres.`;
+**Tópico do Post:** ${input.topic}
+
+Gere o prompt final em uma única linha de texto, separando os conceitos por vírgulas.`;
 
     // Chama o modelo de IA com o prompt.
     const { text } = await ai.generate({
