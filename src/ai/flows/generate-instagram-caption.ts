@@ -43,7 +43,7 @@ const prompt = ai.definePrompt({
   name: 'generateInstagramCaptionPrompt',
   input: {schema: GenerateInstagramCaptionInputSchema},
   output: {schema: GenerateInstagramCaptionOutputSchema},
-  prompt: `Você é um especialista em marketing de mídia social para o Instagram. Gere uma legenda envolvente e relevante para o Instagram com base no seguinte tópico de postagem. Mantenha a legenda abaixo do limite de caracteres do Instagram. Não inclua hashtags na legenda.
+  prompt: `Você é um especialista em marketing de mídia social para o Instagram. Gere uma legenda envolvente e relevante para o Instagram com base no seguinte tópico de postagem. Mantenha a legenda abaixo do limite de caracteres do Instagram. Não inclua hashtags na legenda. A legenda deve terminar com uma chamada para ação (CTA) clara e relevante para o tópico.
 
 Tópico da postagem: {{{postTopic}}}`,
 });
