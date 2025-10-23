@@ -249,11 +249,25 @@ export async function generateContentAction(data: unknown): Promise<{...}> {
 
 -   **Explicação:** A diretiva `'use server'` transforma esta função em uma Ação de Servidor. A página `page.tsx` pode chamar `generateContentAction` como se fosse uma função local, mas o Next.js a executa de forma segura no servidor. Ela valida a entrada, chama o fluxo Genkit e retorna os dados (ou um erro) para a página.
 
-#### Componentes (`src/components/...`)
+#### Componentes Customizados (`src/components/...`)
 
--   **`instaboost-form.tsx`**: Um formulário construído com `react-hook-form` para um gerenciamento eficiente e `zod` para validação. Ele é responsável por capturar o tópico do usuário e chamar a função `onSubmit` (que é a `handleFormSubmit` da página principal).
--   **`generated-content.tsx`**: Recebe o conteúdo gerado pela IA e o exibe de forma organizada em `Card`s. Cada `Card` tem um título, um ícone e um botão de cópia (`copy-button.tsx`), melhorando a usabilidade.
--   **`copy-button.tsx`**: Um pequeno componente reutilizável que, ao ser clicado, copia o texto fornecido para a área de transferência do usuário usando a API `navigator.clipboard`.
+Aqui detalhamos os componentes que criamos especificamente para o PostIA.
+
+-   **`instaboost-form.tsx`**: Este é o coração da interação com o usuário.
+    -   **Tecnologias:** Usamos `react-hook-form` para gerenciar o estado do formulário de forma eficiente e `zod` com `@hookform/resolvers/zod` para criar um esquema de validação robusto. Isso garante que o usuário não possa enviar um tópico vazio ou muito curto, por exemplo.
+    -   **Props (Propriedades):** Ele recebe duas props da página principal: `onSubmit` (a função que será chamada quando o formulário for enviado com sucesso) e `isLoading` (um booleano que nos diz se a IA está processando).
+    -   **Funcionalidade:** Quando o botão "Gerar Conteúdo Mágico" é clicado, `react-hook-form` valida os dados. Se forem válidos, ele chama a função `onSubmit` passando o tópico. A prop `isLoading` é usada para desabilitar o botão e mostrar um ícone de carregamento (`Loader2`), prevenindo envios duplicados e dando feedback visual ao usuário.
+    -   **UI:** O componente é estilizado usando componentes `shadcn/ui` como `Card`, `Form`, `FormLabel`, `Input` e `Button`, garantindo consistência visual com o resto do app.
+
+-   **`generated-content.tsx`**: Este componente é responsável por exibir os resultados da IA de forma clara e organizada.
+    -   **Props:** Ele recebe uma única prop, `content`, que é um objeto contendo a legenda (`caption`), as hashtags (`hashtags`) e o prompt de imagem (`prompt`) gerados.
+    -   **Estrutura:** O conteúdo é dividido em três seções, cada uma dentro de um componente `ContentCard` customizado. Isso torna o layout modular e fácil de ler. Usamos `Badge` para exibir as hashtags e `whitespace-pre-wrap` para que a quebra de linha da legenda seja respeitada.
+    -   **Componente Filho:** Ele utiliza nosso `copy-button.tsx` em cada card para permitir que o usuário copie facilmente cada parte do conteúdo.
+
+-   **`copy-button.tsx`**: Um pequeno mas poderoso componente de usabilidade.
+    -   **Funcionalidade:** Ele recebe uma prop `textToCopy`. Ao ser clicado, ele usa a API do navegador `navigator.clipboard.writeText()` para copiar o texto para a área de transferência do usuário.
+    -   **Feedback Visual:** Para confirmar a ação, o componente gerencia um estado interno `copied`. Quando o texto é copiado, o estado muda para `true`, o ícone de "Copiar" (`Copy`) é substituído por um ícone de "Verificado" (`Check`), e a cor do ícone muda para verde. Após 2 segundos, um `setTimeout` reseta o estado, e o ícone volta ao normal. Isso fornece um feedback claro e imediato para o usuário.
+
 -   **`src/components/ui/`**: Esta pasta contém os blocos de construção da nossa interface, como `Button`, `Input`, `Card`, etc. Eles são da biblioteca `shadcn/ui`, que nos dá componentes bonitos, acessíveis e customizáveis.
 
 ---
