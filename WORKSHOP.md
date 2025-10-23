@@ -186,7 +186,7 @@ export default function Home() {
   // O JSX que renderiza a página
   return (
     // ... Header, etc ...
-    <InstaBoostForm onSubmit={handleFormSubmit} isLoading={isLoading} />
+    <PostiaForm onSubmit={handleFormSubmit} isLoading={isLoading} />
 
     <div className="mt-8 md:mt-12">
       {isLoading && <LoadingState />}
@@ -253,7 +253,7 @@ export async function generateContentAction(data: unknown): Promise<{...}> {
 
 Aqui detalhamos os componentes que criamos especificamente para o PostIA.
 
--   **`instaboost-form.tsx`**: Este é o coração da interação com o usuário.
+-   **`postia-form.tsx`**: Este é o coração da interação com o usuário.
     -   **Tecnologias:** Usamos `react-hook-form` para gerenciar o estado do formulário de forma eficiente e `zod` com `@hookform/resolvers/zod` para criar um esquema de validação robusto. Isso garante que o usuário não possa enviar um tópico vazio ou muito curto, por exemplo.
     -   **Props (Propriedades):** Ele recebe duas props da página principal: `onSubmit` (a função que será chamada quando o formulário for enviado com sucesso) e `isLoading` (um booleano que nos diz se a IA está processando).
     -   **Funcionalidade:** Quando o botão "Gerar Conteúdo Mágico" é clicado, `react-hook-form` valida os dados. Se forem válidos, ele chama a função `onSubmit` passando o tópico. A prop `isLoading` é usada para desabilitar o botão e mostrar um ícone de carregamento (`Loader2`), prevenindo envios duplicados e dando feedback visual ao usuário.

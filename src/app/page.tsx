@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { InstaBoostForm } from '@/components/instaboost-form';
+import { PostiaForm } from '@/components/postia-form';
 import { GeneratedContent } from '@/components/generated-content';
 import type { GeneratedContent as GeneratedContentType } from '@/lib/types';
 import { generateContentAction } from '@/app/actions';
@@ -54,7 +54,7 @@ export default function Home() {
             </p>
           </header>
 
-          <InstaBoostForm onSubmit={handleFormSubmit} isLoading={isLoading} />
+          <PostiaForm onSubmit={handleFormSubmit} isLoading={isLoading} />
 
           <div className="mt-8 md:mt-12">
             {isLoading && <LoadingState />}

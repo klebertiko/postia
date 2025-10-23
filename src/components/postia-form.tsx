@@ -26,12 +26,12 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface InstaBoostFormProps {
+interface PostiaFormProps {
   onSubmit: (data: FormValues) => Promise<void>;
   isLoading: boolean;
 }
 
-export function InstaBoostForm({ onSubmit, isLoading }: InstaBoostFormProps) {
+export function PostiaForm({ onSubmit, isLoading }: PostiaFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
