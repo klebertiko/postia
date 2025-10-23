@@ -1,0 +1,34 @@
+<svg
+  width="128"
+  height="128"
+  viewBox="0 0 128 128"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <style>
+    .background { fill: #211333; }
+    .icon { stroke: #8F65D4; }
+    @media (prefers-color-scheme: dark) {
+      .background { fill: #211333; }
+      .icon { stroke: #8F65D4; }
+    }
+  </style>
+  <rect width="128" height="128" rx="24" class="background" />
+  <g transform="translate(24, 24) scale(2.66)">
+    <path
+      d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="icon"
+      fill="none"
+    />
+    <path
+      d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="icon"
+      fill="none"
+    />
+  </g>
+</svg>
