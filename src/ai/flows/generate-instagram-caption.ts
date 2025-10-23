@@ -1,11 +1,11 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for generating Instagram captions based on a user-provided post topic.
+ * @fileOverview Este arquivo define um fluxo Genkit para gerar legendas do Instagram com base em um tópico de postagem fornecido pelo usuário.
  *
- * - generateInstagramCaption - A function that generates an Instagram caption.
- * - GenerateInstagramCaptionInput - The input type for the generateInstagramCaption function.
- * - GenerateInstagramCaptionOutput - The return type for the generateInstagramCaption function.
+ * - generateInstagramCaption - Uma função que gera uma legenda para o Instagram.
+ * - GenerateInstagramCaptionInput - O tipo de entrada para a função generateInstagramCaption.
+ * - GenerateInstagramCaptionOutput - O tipo de retorno da função generateInstagramCaption.
  */
 
 import {ai} from '@/ai/genkit';
@@ -14,7 +14,7 @@ import {z} from 'genkit';
 const GenerateInstagramCaptionInputSchema = z.object({
   postTopic: z
     .string()
-    .describe('The topic of the post for which to generate a caption.'),
+    .describe('O tópico do post para o qual gerar uma legenda.'),
 });
 
 export type GenerateInstagramCaptionInput = z.infer<
@@ -25,7 +25,7 @@ const GenerateInstagramCaptionOutputSchema = z.object({
   caption: z
     .string()
     .describe(
-      'A relevant and engaging caption for the post, within Instagrams character limit.'
+      'Uma legenda relevante e envolvente para o post, dentro do limite de caracteres do Instagram.'
     ),
 });
 
@@ -43,9 +43,9 @@ const prompt = ai.definePrompt({
   name: 'generateInstagramCaptionPrompt',
   input: {schema: GenerateInstagramCaptionInputSchema},
   output: {schema: GenerateInstagramCaptionOutputSchema},
-  prompt: `You are a social media marketing specialist for Instagram. Generate an engaging and relevant Instagram caption based on the following post topic. Keep the caption under Instagram's character limit.
+  prompt: `Você é um especialista em marketing de mídia social para o Instagram. Gere uma legenda envolvente e relevante para o Instagram com base no seguinte tópico de postagem. Mantenha a legenda abaixo do limite de caracteres do Instagram.
 
-Post Topic: {{{postTopic}}}`,
+Tópico da postagem: {{{postTopic}}}`,
 });
 
 const generateInstagramCaptionFlow = ai.defineFlow(

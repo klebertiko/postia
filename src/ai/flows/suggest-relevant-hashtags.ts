@@ -1,11 +1,11 @@
 'use server';
 
 /**
- * @fileOverview A flow that suggests relevant hashtags for a post topic.
+ * @fileOverview Um fluxo que sugere hashtags relevantes para um tópico de postagem.
  *
- * - suggestRelevantHashtags - A function that takes a post topic and returns a list of relevant hashtags.
- * - SuggestRelevantHashtagsInput - The input type for the suggestRelevantHashtags function.
- * - SuggestRelevantHashtagsOutput - The return type for the suggestRelevantHashtags function.
+ * - suggestRelevantHashtags - Uma função que recebe um tópico de postagem e retorna uma lista de hashtags relevantes.
+ * - SuggestRelevantHashtagsInput - O tipo de entrada para a função suggestRelevantHashtags.
+ * - SuggestRelevantHashtagsOutput - O tipo de retorno da função suggestRelevantHashtags.
  */
 
 import {ai} from '@/ai/genkit';
@@ -14,7 +14,7 @@ import {z} from 'genkit';
 const SuggestRelevantHashtagsInputSchema = z.object({
   postTopic: z
     .string()
-    .describe('The topic of the post for which to suggest hashtags.'),
+    .describe('O tópico do post para o qual sugerir hashtags.'),
 });
 export type SuggestRelevantHashtagsInput = z.infer<
   typeof SuggestRelevantHashtagsInputSchema
@@ -23,7 +23,7 @@ export type SuggestRelevantHashtagsInput = z.infer<
 const SuggestRelevantHashtagsOutputSchema = z.object({
   hashtags: z
     .array(z.string())
-    .describe('A list of relevant hashtags for the post topic.'),
+    .describe('Uma lista de hashtags relevantes para o tópico da postagem.'),
 });
 export type SuggestRelevantHashtagsOutput = z.infer<
   typeof SuggestRelevantHashtagsOutputSchema
@@ -39,11 +39,11 @@ const prompt = ai.definePrompt({
   name: 'suggestRelevantHashtagsPrompt',
   input: {schema: SuggestRelevantHashtagsInputSchema},
   output: {schema: SuggestRelevantHashtagsOutputSchema},
-  prompt: `You are a social media marketing specialist for Instagram.
+  prompt: `Você é um especialista em marketing de mídia social para o Instagram.
 
-  Given the following post topic, suggest a list of relevant hashtags. Do not include the '#' character in the response.
+  Dado o seguinte tópico de postagem, sugira uma lista de hashtags relevantes. Não inclua o caractere '#' na resposta.
   
-  Post Topic: {{{postTopic}}}`,
+  Tópico da postagem: {{{postTopic}}}`,
 });
 
 const suggestRelevantHashtagsFlow = ai.defineFlow(

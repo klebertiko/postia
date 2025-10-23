@@ -30,7 +30,7 @@ export function CopyButton({ textToCopy, className, ...props }: CopyButtonProps)
       variant="ghost"
       size="icon"
       className={cn('h-8 w-8 text-muted-foreground hover:text-foreground', className)}
-      aria-label={copied ? 'Copiado' : 'Copiar para a área de transferência'}
+      aria-label={copied ? 'Copiado!' : 'Copiar para a área de transferência'}
       {...props}
     >
       {copied ? (

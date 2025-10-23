@@ -1,10 +1,10 @@
 'use server';
 /**
- * @fileOverview A flow that generates an optimized prompt for image generation based on a user-provided post topic.
+ * @fileOverview Um fluxo que gera um prompt otimizado para geração de imagem com base em um tópico de postagem fornecido pelo usuário.
  *
- * - generateGeminiNanoPrompt - A function that generates the prompt.
- * - GenerateGeminiNanoPromptInput - The input type for the generateGeminiNanoPrompt function.
- * - GenerateGeminiNanoPromptOutput - The return type for the generateGeminiNanoPrompt function.
+ * - generateGeminiNanoPrompt - Uma função que gera o prompt.
+ * - GenerateGeminiNanoPromptInput - O tipo de entrada para a função generateGeminiNanoPrompt.
+ * - GenerateGeminiNanoPromptOutput - O tipo de retorno para a função generateGeminiNanoPrompt.
  */
 
 import {ai} from '@/ai/genkit';
@@ -13,7 +13,7 @@ import {z} from 'genkit';
 const GenerateGeminiNanoPromptInputSchema = z.object({
   postTopic: z
     .string()
-    .describe('The topic of the post for which to generate an image prompt.'),
+    .describe('O tópico do post para o qual gerar um prompt de imagem.'),
 });
 export type GenerateGeminiNanoPromptInput = z.infer<
   typeof GenerateGeminiNanoPromptInputSchema
@@ -22,7 +22,7 @@ export type GenerateGeminiNanoPromptInput = z.infer<
 const GenerateGeminiNanoPromptOutputSchema = z.object({
   prompt: z
     .string()
-    .describe('The optimized prompt for image generation.'),
+    .describe('O prompt otimizado para geração de imagem.'),
 });
 export type GenerateGeminiNanoPromptOutput = z.infer<
   typeof GenerateGeminiNanoPromptOutputSchema
@@ -38,13 +38,13 @@ const prompt = ai.definePrompt({
   name: 'generateGeminiNanoPromptPrompt',
   input: {schema: GenerateGeminiNanoPromptInputSchema},
   output: {schema: GenerateGeminiNanoPromptOutputSchema},
-  prompt: `You are an expert in image prompt engineering for Instagram.
+  prompt: `Você é um especialista em engenharia de prompts de imagem para o Instagram.
 
-  Your goal is to create a highly effective prompt for image generation based on the user's post topic.
+  Seu objetivo é criar um prompt altamente eficaz para a geração de imagens com base no tópico do post do usuário.
 
-  Post Topic: {{{postTopic}}}
+  Tópico do Post: {{{postTopic}}}
 
-  Generate a concise and creative prompt that captures the essence of the topic and is optimized for creating a visually appealing Instagram post. The prompt should not exceed 200 characters.
+  Gere um prompt conciso e criativo que capture a essência do tópico e seja otimizado para criar um post visualmente atraente no Instagram. O prompt não deve exceder 200 caracteres.
   `,
 });
 
