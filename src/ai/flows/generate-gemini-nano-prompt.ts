@@ -38,22 +38,28 @@ export const imagePromptGeneratorTool = ai.defineTool(
   // Ela usa um prompt do Genkit para chamar o modelo de IA.
   async input => {
     // Define o prompt que será enviado ao modelo de IA.
-    const prompt = `Você é um Engenheiro de Prompt Sênior especialista em gerar imagens para mídias sociais.
-Sua tarefa é criar um prompt detalhado e estruturado para o modelo de imagem, baseado em um tópico.
-O prompt deve ser otimizado para criar uma imagem visualmente impactante, profissional e adequada para o Instagram.
+    const prompt = `Você é um Engenheiro de Prompt Sênior, especialista em gerar prompts para imagens que sejam seguros, precisos, de alta qualidade e adequados para mídias sociais.
 
-Estruture sua resposta seguindo as diretrizes abaixo:
+Sua tarefa é criar um prompt detalhado e estruturado para um modelo de geração de imagem, baseado em um tópico, garantindo que a representação visual seja sempre segura e apropriada.
+
+**Diretrizes de Segurança e Precisão (Regra Principal):**
+1.  **Segurança em Primeiro Lugar:** Garanta que todos os elementos visuais representados na imagem sejam seguros, apropriados e factualmente corretos dentro do contexto da cena.
+2.  **Especificidade para Segurança:** Ao lidar com categorias onde a segurança é crucial (ex: alimentação, acessórios, plantas, produtos de saúde), você DEVE substituir descrições genéricas por uma lista específica e verificada de elementos POSITIVOS e SEGUROS.
+3.  **Reforço Positivo e Negativo:** Combine a lista de itens seguros (o que incluir) com uma instrução negativa generalizada para evitar perigos (ex: 'evitar elementos perigosos ou impróprios').
+
+**Estrutura do Prompt de Saída:**
+O prompt final deve ser uma única linha de texto em português do Brasil, separando os conceitos por vírgulas. Siga esta estrutura:
 1.  **Assunto Principal:** Descreva a cena central de forma clara e objetiva.
 2.  **Estilo e Atmosfera:** Especifique o estilo (ex: foto realista, cinematográfico, minimalista) e a atmosfera (ex: acolhedor, clínico, vibrante).
 3.  **Iluminação:** Detalhe a iluminação (ex: luz natural suave, iluminação de estúdio dramática).
 4.  **Cores e Paleta:** Sugira uma paleta de cores (ex: tons pastéis, cores vibrantes, monocromático).
 5.  **Composição:** Indique o enquadramento (ex: close-up, plano médio, vista de cima).
-6.  **Detalhes Adicionais:** Adicione elementos que enriqueçam a cena, se aplicável.
-7.  **Negativos:** (Opcional) Liste elementos a serem evitados.
+6.  **Detalhes Adicionais:** Adicione elementos específicos e seguros que enriqueçam a cena.
+7.  **Negativos:** Liste de forma geral os elementos a serem evitados para garantir a segurança (ex: evitar objetos cortantes, plantas venenosas, alimentos inseguros).
 
 **Tópico do Post:** ${input.topic}
 
-Gere o prompt final em uma única linha de texto, em português do Brasil, separando os conceitos por vírgulas.`;
+Gere o prompt final AGORA.`;
 
     // Chama o modelo de IA com o prompt.
     const { text } = await ai.generate({
