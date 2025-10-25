@@ -10,7 +10,7 @@ O PostIA é um assistente de marketing para Instagram. A ideia é simples: o usu
 
 1.  **Legenda Cativante:** Com uma chamada para ação (CTA) relevante.
 2.  **Hashtags Estratégicas:** Para aumentar o alcance.
-3.  **Prompt de Imagem Detalhado e Seguro:** Otimizado para modelos de IA de geração de imagem, com verificação de fatos.
+3.  **Prompt de Imagem Detalhado e Seguro:** Otimizado para modelos de IA de geração de imagem.
 
 ## 🛠️ A Arquitetura: Next.js + Genkit na Vercel
 
@@ -349,9 +349,9 @@ Aqui detalhamos os componentes que criamos especificamente para o PostIA.
             -   `h-5 w-5`: Define a altura (`height`) e a largura (`width`) do ícone para `5`.
             -   `animate-spin`: Classe utilitária do Tailwind que aplica uma animação de rotação contínua (keyframes `spin`). Nós a usamos para indicar claramente que algo está acontecendo.
 
--   **`generated-content.tsx`**: Este componente é responsável por exibir os resultados da IA de forma clara e organizada.
+-   **`generated-content.tsx`**: Este componente é responsável por exibir os resultados da IA de forma clara e organizada. Ele também inclui links úteis para plataformas de geração de imagem.
     -   **Props:** Ele recebe uma única prop, `content`, que é um objeto contendo a legenda (`caption`), as hashtags (`hashtags`) e o prompt de imagem (`prompt`) gerados.
-    -   **Estrutura:** O conteúdo é dividido em três seções, cada uma dentro de um componente `ContentCard` customizado. Isso torna o layout modular e fácil de ler.
+    -   **Estrutura:** O conteúdo é dividido em três seções, cada uma dentro de um componente `ContentCard` customizado. Isso torna o layout modular e fácil de ler. Na seção de prompt de imagem, há uma lista de botões com links externos.
     -   **Explicação Detalhada do Estilo (Classes Tailwind):**
         -   No `div` principal:
             -   `space-y-8`: Similar ao `space-y-6` do formulário, mas com um espaço vertical maior para separar visualmente cada `ContentCard`.
@@ -367,6 +367,11 @@ Aqui detalhamos os componentes que criamos especificamente para o PostIA.
             -   `bg-muted`: Define o fundo para a nossa cor "muted", criando um bloco de cor que destaca o prompt.
             -   `rounded-md`: Aplica bordas arredondadas de tamanho médio (`medium`).
             -   `p-3`: Adiciona um `padding` (espaçamento interno) de tamanho `3` em todos os lados.
+        -   Nos botões de link externo:
+            -   `asChild`: Prop do nosso componente de botão que o faz renderizar como seu elemento filho (no caso, a tag `<a>`), mas mantendo os estilos do botão.
+            -   `variant="outline"`: Aplica o estilo de botão "contornado".
+            -   `justify-start`: Alinha o conteúdo do botão (ícone e texto) à esquerda.
+            -   `ml-auto`: No ícone `ExternalLink`, esta classe aplica uma `margin-left: auto`, o que empurra o ícone para o extremo direito do botão.
 
 -   **`copy-button.tsx`**: Um pequeno mas poderoso componente de usabilidade.
     -   **Funcionalidade:** Ele recebe uma prop `textToCopy`. Ao ser clicado, ele usa a API do navegador `navigator.clipboard.writeText()` para copiar o texto para a área de transferência do usuário.
@@ -417,7 +422,7 @@ Esta é a etapa mais importante. Precisamos informar à Vercel qual é a nossa `
 Parabéns! Você desvendou a arquitetura completa do PostIA e aprendeu a fazer o deploy.
 
 -   **No Frontend**, usamos a elegância do **React com Next.js**.
--   **No Backend de IA**, usamos o **Genkit** para orquestrar **agentes de IA especializados** que rodam como **Server Actions** seguras. Um desses agentes agora tem a capacidade de **usar ferramentas** para buscar informações em tempo real, garantindo resultados mais seguros e precisos.
+-   **No Backend de IA**, usamos o **Genkit** para orquestrar **agentes de IA especializados** que rodam como **Server Actions** seguras.
 -   **O Deploy**, foi simplificado ao máximo com a **Vercel**.
 
 Este projeto é um excelente exemplo de como as tecnologias modernas podem ser combinadas para criar aplicações de IA poderosas e úteis. Sinta-se à vontade para experimentar e expandir o projeto!

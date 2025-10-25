@@ -1,6 +1,6 @@
 # 🚀 PostIA: Seu Assistente de Conteúdo para Instagram com IA
 
-Bem-vindo ao PostIA! Este projeto é uma aplicação web completa, construída com Next.js e Genkit, projetada para atuar como um assistente de marketing de mídia social. Com o poder da IA generativa do Google, o PostIA gera legendas, hashtags relevantes e prompts de imagem detalhados e seguros, tudo a partir de um único tópico.
+Bem-vindo ao PostIA! Este projeto é uma aplicação web completa, construída com Next.js e Genkit, projetada para atuar como um assistente de marketing de mídia social. Com o poder da IA generativa do Google, o PostIA gera legendas, hashtags relevantes e prompts de imagem detalhados, tudo a partir de um único tópico.
 
 Este `README` irá guiá-lo para configurar, executar e fazer o deploy do projeto.
 
@@ -9,10 +9,8 @@ Este `README` irá guiá-lo para configurar, executar e fazer o deploy do projet
 ## ✨ Funcionalidades Principais
 
 -   **Geração de Conteúdo com um Clique:** Insira um tópico e deixe a IA fazer o resto.
--   **Arquitetura Multi-Agentes:** O sistema usa agentes de IA especializados (fluxos e ferramentas Genkit) para cada tarefa:
-    -   Um agente para criar legendas persuasivas com uma chamada para ação (CTA).
-    -   Um agente para sugerir as hashtags mais relevantes para o seu tópico.
-    -   Um agente "Engenheiro de Prompt Sênior" que **usa uma ferramenta de busca** para verificar a segurança dos elementos antes de criar prompts de imagem otimizados.
+-   **Geração de Legendas, Hashtags e Prompts de Imagem:** Um pacote completo de conteúdo para suas postagens.
+-   **Links para Geradores de Imagem:** Após gerar um prompt de imagem, o app fornece links diretos para plataformas como o Gemini para você poder criar sua imagem instantaneamente.
 -   **Interface Moderna e Responsiva:** Construído com Next.js, React, Tailwind CSS e shadcn/ui.
 -   **Progressive Web App (PWA):** O aplicativo pode ser instalado em dispositivos móveis e desktops para uma experiência nativa.
 
