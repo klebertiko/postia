@@ -40,8 +40,8 @@ export default function Home() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <div className="mx-auto max-w-4xl 2xl:max-w-7xl">
-          <header className="text-center mb-8 md:mb-12">
+        <div className="mx-auto flex flex-col gap-8 md:gap-12 max-w-4xl 2xl:max-w-7xl">
+          <header className="text-center">
             <div className="inline-flex items-center gap-4 mb-4">
               <PenSquare className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
               <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-primary">
@@ -56,7 +56,7 @@ export default function Home() {
 
           <PostiaForm onSubmit={handleFormSubmit} isLoading={isLoading} />
 
-          <div className="mt-8 md:mt-12">
+          <div>
             {isLoading && <LoadingState />}
             {generatedContent && <GeneratedContent content={generatedContent} />}
           </div>
