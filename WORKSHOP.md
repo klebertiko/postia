@@ -10,7 +10,7 @@ O PostIA é um assistente de marketing para Instagram. A ideia é simples: o usu
 
 1.  **Legenda Cativante:** Com uma chamada para ação (CTA) relevante.
 2.  **Hashtags Estratégicas:** Para aumentar o alcance.
-3.  **Prompt de Imagem Detalhado:** Otimizado para modelos de IA de geração de imagem.
+3.  **Prompt de Imagem Detalhado e Seguro:** Otimizado para modelos de IA de geração de imagem, com verificação de fatos.
 
 ## 🛠️ A Arquitetura: Next.js + Genkit na Vercel
 
@@ -37,7 +37,7 @@ Esses arquivos definem a estrutura e as dependências do nosso projeto.
 
 ### 2. A Arquitetura de IA com Genkit (`src/ai/...`)
 
-Esta é a parte mais mágica do projeto. Usamos uma **arquitetura de múltiplos agentes**, onde cada "agente" é uma ferramenta especializada.
+Esta é a parte mais mágica do projeto. Usamos uma **arquitetura de múltiplos agentes**, onde cada "agente" é uma ferramenta ou fluxo especializado.
 
 #### `src/ai/genkit.ts`
 
@@ -63,89 +63,122 @@ export const ai = genkit({
 
 #### A Estratégia dos Múltiplos Agentes
 
-Em vez de um único prompt gigante tentando fazer tudo, nós criamos "ferramentas" (agentes) menores e focadas:
+Em vez de um único prompt gigante tentando fazer tudo, nós criamos "ferramentas" e "fluxos" menores e focados:
 
 1.  **Agente de Legenda** (`generate-instagram-caption.ts`): Especialista em criar textos de posts.
 2.  **Agente de Hashtags** (`suggest-relevant-hashtags.ts`): Especialista em marketing e SEO de hashtags.
-3.  **Agente de Prompt de Imagem** (`generate-gemini-nano-prompt.ts`): Um engenheiro de prompt sênior que sabe exatamente como pedir a uma IA para desenhar algo incrível.
+3.  **Ferramenta de Busca** (`google-search-tool.ts`): Uma ferramenta que simula uma busca na web para verificar fatos.
+4.  **Agente de Prompt de Imagem** (`generate-gemini-nano-prompt.ts`): Um engenheiro de prompt sênior que agora **usa a ferramenta de busca** para garantir a segurança dos elementos no prompt.
+5.  **Agente de Conteúdo** (`content-agent-flow.ts`): O orquestrador que coordena todos os outros.
 
-E, orquestrando tudo, temos o **Agente de Conteúdo**.
+#### `src/ai/tools/google-search-tool.ts` (A Ferramenta de Busca)
+
+Este é um novo tipo de arquivo: uma **ferramenta**. Uma ferramenta é uma função que um agente de IA pode decidir chamar para obter informações externas.
+
+```typescript
+'use server';
+// ... imports ...
+
+// Definimos a ferramenta de busca usando `ai.defineTool`.
+export const googleSearchTool = ai.defineTool(
+  {
+    name: 'googleSearchTool',
+    description: 'Realiza uma busca na web para responder a uma pergunta...',
+    inputSchema: SearchInputSchema,
+    outputSchema: SearchOutputSchema,
+  },
+  async (input) => {
+    console.log(`🔎 Realizando busca simulada por: "${input.query}"`);
+
+    // **Simulação de Respostas da API de Busca**
+    // Em um app real, aqui você chamaria uma API de busca de verdade.
+    const query = input.query.toLowerCase();
+    if (query.includes('alface romana') && query.includes('porquinho da índia')) {
+      return "Não, alface romana não é segura...";
+    }
+    // ... outras respostas simuladas ...
+
+    return `Resultado da busca para "${input.query}": (Resposta simulada).`;
+  }
+);
+```
+-   **Explicação:** Nós definimos uma `googleSearchTool` que um modelo de IA pode usar. A `description` é crucial, pois é como o modelo sabe *quando* e *para que* usar a ferramenta. Por enquanto, a busca é simulada, mas ela já demonstra o conceito de dar ao agente a capacidade de buscar informações externas para tomar decisões mais seguras.
+
+
+#### `src/ai/flows/generate-gemini-nano-prompt.ts` (O Agente Pesquisador)
+
+Este agente foi promovido. Antes era uma simples ferramenta, agora é um `Flow` (fluxo) que pode usar outras ferramentas.
+
+```typescript
+'use server';
+// ... imports ...
+import { googleSearchTool } from '../tools/google-search-tool';
+
+// ... esquemas de entrada e saída ...
+
+// Define o fluxo do agente que agora pode usar ferramentas.
+const imagePromptFlow = ai.defineFlow(
+  {
+    name: 'imagePromptGeneratorFlow',
+    // ... schemas ...
+  },
+  async input => {
+    // O prompt foi atualizado para ser muito mais explícito.
+    const prompt = `Você é um Engenheiro de Prompt Sênior e um especialista em pesquisa de segurança.
+**Processo Obrigatório:**
+1. Analise o tópico: "${input.topic}".
+2. Para CADA elemento que você pretende incluir..., você DEVE USAR a ferramenta 'googleSearchTool' para fazer uma pergunta específica sobre sua segurança.
+3. Construa uma lista de elementos POSITIVOS E COMPROVADAMENTE SEGUROS com base nas respostas da busca.
+...`;
+
+    // Executa o modelo de IA, fornecendo a ferramenta de busca.
+    const result = await ai.generate({
+      prompt: prompt,
+      model: 'googleai/gemini-2.5-flash', // Um modelo capaz de usar ferramentas
+      tools: [googleSearchTool], // Aqui está a mágica: damos a ferramenta ao agente!
+      output: { schema: ImagePromptOutputSchema },
+    });
+
+    return result.output!;
+  }
+);
+```
+-   **Explicação:** O `imagePromptFlow` agora é um `ai.defineFlow`. Ao gerar o conteúdo, nós passamos a `googleSearchTool` no array de `tools`. O prompt instrui o modelo de IA a **obrigatoriamente** usar essa ferramenta para verificar cada item antes de adicioná-lo ao prompt de imagem final. Isso resolve o problema de segurança que encontramos (como o da alface romana) de uma forma robusta.
+
 
 #### `src/ai/flows/content-agent-flow.ts` (O Agente Chefe)
 
-Este é o orquestrador. Ele recebe o tópico do usuário e coordena os outros agentes para produzir o resultado final.
+O orquestrador foi simplificado. Em vez de gerenciar várias ferramentas, ele agora chama cada agente especializado em paralelo e aguarda os resultados.
 
 ```typescript
 'use server';
 // ... imports ...
 import { captionGeneratorTool } from './generate-instagram-caption';
 import { hashtagSuggesterTool } from './suggest-relevant-hashtags';
-import { imagePromptGeneratorTool } from './generate-gemini-nano-prompt';
+import { generateImagePrompt } from './generate-gemini-nano-prompt';
 
 // ... esquemas de entrada e saída com Zod ...
 
-// O fluxo principal
-const contentAgentFlow = ai.defineFlow(
-  { /* ... schemas ... */ },
-  async input => {
-    // O prompt para o agente orquestrador
-    const prompt = `Você é um agente de IA assistente de marketing...
-Sua tarefa é gerar o conteúdo completo para um post...
-Você DEVE usar as ferramentas disponíveis...
-Tópico do Post: ${input.postTopic}`;
+export async function generatePostContent(
+  input: GeneratePostContentInput
+): Promise<GeneratePostContentOutput> {
+  // Chama os agentes em paralelo para otimizar o tempo de resposta.
+  const [captionResult, hashtagResult, imagePromptResult] = await Promise.all([
+    captionGeneratorTool({ topic: input.postTopic }),
+    hashtagSuggesterTool({ topic: input.postTopic }),
+    generateImagePrompt({ topic: input.postTopic }), // Chama a função exportada do fluxo de imagem
+  ]);
 
-    // A mágica acontece aqui!
-    const result = await ai.generate({
-      prompt: prompt,
-      tools: [ // Fornecemos as "ferramentas" (nossos outros agentes)
-        captionGeneratorTool,
-        hashtagSuggesterTool,
-        imagePromptGeneratorTool,
-      ],
-      output: { // Definimos o formato que queremos receber de volta
-        schema: GeneratePostContentOutputSchema,
-      },
-    });
-
-    return result.output!; // Acessamos a saída já estruturada
-  }
-);
+  return {
+    caption: captionResult.caption,
+    hashtags: hashtagResult.hashtags,
+    imagePrompt: imagePromptResult.imagePrompt,
+  };
+}
 ```
 
--   **Explicação:** O `contentAgentFlow` recebe o tópico. Ele então instrui um modelo de IA (o "cérebro" do orquestrador) a usar as três ferramentas (`captionGeneratorTool`, `hashtagSuggesterTool`, `imagePromptGeneratorTool`) para cumprir a tarefa. O Genkit gerencia a chamada a essas ferramentas e monta a resposta final no formato que especificamos (`GeneratePostContentOutputSchema`).
+-   **Explicação:** A função `generatePostContent` agora usa `Promise.all`. Isso dispara as chamadas para os três agentes (legenda, hashtags e prompt de imagem) simultaneamente. O sistema não precisa esperar a legenda terminar para começar a gerar as hashtags. Isso torna a geração de conteúdo muito mais rápida e eficiente.
 
-#### As Ferramentas (`src/ai/flows/generate-instagram-caption.ts`, etc.)
-
-Vamos olhar para um dos agentes-ferramenta, o `captionGeneratorTool`.
-
-```typescript
-'use server';
-// ... imports ...
-
-// Definimos a ferramenta com `ai.defineTool`
-export const captionGeneratorTool = ai.defineTool(
-  {
-    name: 'captionGenerator',
-    description: 'Gera uma legenda de postagem do Instagram...', // A descrição é MUITO importante. É como o orquestrador sabe para que serve a ferramenta.
-    inputSchema: CaptionInputSchema, // O que a ferramenta espera receber
-    outputSchema: CaptionOutputSchema, // O que ela devolve
-  },
-  async input => { // A lógica da ferramenta
-    // Prompt específico para esta tarefa
-    const prompt = `Você é um especialista em marketing de mídia social...
-Gere uma legenda envolvente... NÃO inclua hashtags... DEVE terminar com um CTA...
-Tópico da postagem: ${input.topic}`;
-
-    // Chama a IA para gerar o texto
-    const { text } = await ai.generate({ prompt });
-    
-    // Retorna o resultado no formato esperado
-    return { caption: text };
-  }
-);
-```
-
--   **Explicação:** Cada arquivo de ferramenta define um `ai.defineTool`. Ele tem um `name` e uma `description` (para o orquestrador entender o que faz) e `inputSchema`/`outputSchema` (para validar os dados). A lógica interna é um prompt focado em uma única tarefa, garantindo um resultado de alta qualidade. Os outros agentes (`hashtagSuggesterTool` e `imagePromptGeneratorTool`) seguem exatamente a mesma estrutura.
 
 ### 3. A Interface do Usuário (`src/app/...` e `src/components/...`)
 
@@ -313,7 +346,7 @@ Esta é a etapa mais importante. Precisamos informar à Vercel qual é a nossa `
 Parabéns! Você desvendou a arquitetura completa do PostIA e aprendeu a fazer o deploy.
 
 -   **No Frontend**, usamos a elegância do **React com Next.js**.
--   **No Backend de IA**, usamos o **Genkit** para orquestrar **agentes de IA especializados** que rodam como **Server Actions** seguras.
+-   **No Backend de IA**, usamos o **Genkit** para orquestrar **agentes de IA especializados** que rodam como **Server Actions** seguras. Um desses agentes agora tem a capacidade de **usar ferramentas** para buscar informações em tempo real, garantindo resultados mais seguros e precisos.
 -   **O Deploy**, foi simplificado ao máximo com a **Vercel**.
 
 Este projeto é um excelente exemplo de como as tecnologias modernas podem ser combinadas para criar aplicações de IA poderosas e úteis. Sinta-se à vontade para experimentar e expandir o projeto!
