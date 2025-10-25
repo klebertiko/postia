@@ -30,10 +30,31 @@ Vamos explorar o projeto pasta por pasta, arquivo por arquivo.
 Esses arquivos definem a estrutura e as dependências do nosso projeto.
 
 -   **`package.json`**: O coração de qualquer projeto Node.js. Ele lista todas as "peças" (pacotes) que usamos, como `next`, `react`, `genkit`, `tailwindcss`, etc. Os `scripts` definem atalhos como `npm run dev` para iniciar o projeto.
--   **`tailwind.config.ts`**: Arquivo de configuração do Tailwind CSS. Aqui definimos nossa paleta de cores (`primary`, `accent`, etc.) e nossas fontes (`Poppins` para títulos, `PT Sans` para o corpo do texto), mantendo o estilo consistente.
--   **`src/app/globals.css`**: É onde as variáveis de cor definidas no `tailwind.config.ts` são aplicadas. Usamos variáveis CSS (`--background: ...`) para criar temas (no nosso caso, um tema escuro).
+
+#### A Dupla Dinâmica da Estilização: `tailwind.config.ts` e `globals.css`
+
+É crucial entender como esses dois arquivos trabalham juntos. Pense neles como o cérebro e o coração do nosso design.
+
+-   **`tailwind.config.ts`**: Este arquivo é o **"Cérebro do Tailwind"**. Ele não contém CSS. Em vez disso, ele **configura o próprio framework**.
+    -   **`content`**: Aqui dizemos ao Tailwind para escanear todos os nossos arquivos `.tsx` em busca de classes como `bg-primary` ou `text-center`. Isso é uma otimização poderosa: no final, o Tailwind gera um CSS que contém **apenas** as classes que realmente usamos, deixando o arquivo final minúsculo.
+    -   **`theme.extend`**: Aqui nós "ensinamos" novos truques ao Tailwind. Criamos nossa identidade visual:
+        -   **Cores:** Definimos nomes como `primary`, `accent`, `card`, etc. Mas note o valor: `hsl(var(--primary))`. Não estamos definindo a cor diretamente, mas dizendo ao Tailwind: "Ei, para a cor `primary`, use o valor da variável CSS chamada `--primary`".
+        -   **Fontes:** Da mesma forma, criamos os nomes `font-headline` e `font-body`, associando-os às fontes 'Poppins' e 'PT Sans'. Agora, em qualquer lugar do app, podemos usar `font-headline` para ter a fonte de título correta.
+    -   **Analogia:** Pense no `tailwind.config.ts` como a **receita e a lista de ingredientes** do seu restaurante. Ele define que o "molho especial" se chamará `primary` e que a massa `headline` usará farinha 'Poppins'.
+
+-   **`src/app/globals.css`**: Este é o **"Coração que Bombeia os Estilos"**. É aqui que o CSS de verdade é aplicado globalmente.
+    -   **`@tailwind base; ...`**: Essas três linhas no topo são as diretivas que injetam todos os estilos padrão do Tailwind no nosso projeto.
+    -   **`:root`**: Aqui está a mágica! Este é um seletor CSS que representa a raiz do seu documento. Dentro dele, nós finalmente **definimos os valores** para as variáveis que usamos no `tailwind.config.ts`.
+        -   `--background: 267 25% 10%;`
+        -   `--primary: 267 39.2% 55%;`
+        -   Quando você usa `bg-primary`, o `tailwind.config.ts` diz "use a variável `--primary`", e o `globals.css` responde: "Ok, o valor de `--primary` é `267 39.2% 55%`!".
+    -   **Analogia:** O `globals.css` é a **cozinha** do seu restaurante. É aqui que você efetivamente define a temperatura do forno (os valores HSL das variáveis de cor) e mistura os ingredientes (`@tailwind`) para preparar a base de todos os pratos.
+
+**Em resumo: `tailwind.config.ts` define os NOMES e as ABSTRAÇÕES, e `globals.css` define os VALORES REAIS dessas abstrações. Eles são inseparáveis e essenciais.**
+
 -   **`next.config.ts`**: Configurações específicas do Next.js. Adicionamos a configuração do PWA (`@ducanh2912/next-pwa`) para tornar nosso app instalável.
 -   **`.env`**: Este arquivo **não é enviado** para o repositório (por segurança!). Ele armazena "segredos", como a nossa `GEMINI_API_KEY`. O arquivo `src/ai/genkit.ts` lê essa chave para que a IA possa funcionar no ambiente de desenvolvimento local.
+
 
 ### 2. A Arquitetura de IA com Genkit (`src/ai/...`)
 
