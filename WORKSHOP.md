@@ -58,7 +58,7 @@ Esses arquivos definem a estrutura e as dependências do nosso projeto.
 
 ### 2. A Arquitetura de IA com Genkit (`src/ai/...`)
 
-Esta é a parte mágica do projeto. Usamos uma **arquitetura de múltiplos agentes**, onde cada "agente" é um fluxo de IA especializado em uma tarefa.
+Esta é a parte mágica do projeto. Usamos uma **arquitetura de múltiplos agentes**, where cada "agente" é um fluxo de IA especializado em uma tarefa.
 
 #### `src/ai/genkit.ts`
 
@@ -86,7 +86,7 @@ export const ai = genkit({
 
 Em vez de um único prompt gigante tentando fazer tudo, nós criamos "fluxos" (flows) focados, que se comportam como agentes especializados:
 
-1.  **Agente de Legenda (`generate-instagram-caption.ts`)**: Especialista em criar textos cativantes com uma chamada para ação.
+1.  **Agente de Legenda (`generate-post-caption.ts`)**: Especialista em criar textos cativantes com uma chamada para ação.
 2.  **Agente de Hashtags (`suggest-relevant-hashtags.ts`)**: Especialista em marketing, focado em sugerir as melhores hashtags para alcance.
 3.  **Agente de Prompt de Imagem (`generate-gemini-nano-prompt.ts`)**: Um engenheiro de prompt sênior que cria prompts de imagem detalhados e seguros.
 4.  **Agente de Conteúdo (`content-agent-flow.ts`)**: O orquestrador que coordena todos os outros agentes para gerar o pacote de conteúdo completo.
@@ -98,7 +98,7 @@ O orquestrador chama cada agente especializado em paralelo e aguarda os resultad
 ```typescript
 'use server';
 // ... imports ...
-import { generateCaption } from './generate-instagram-caption';
+import { generateCaption } from './generate-post-caption';
 import { suggestHashtags } from './suggest-relevant-hashtags';
 import { generateImagePrompt } from './generate-gemini-nano-prompt';
 

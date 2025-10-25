@@ -14,7 +14,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 // Importa as funções exportadas dos fluxos especializados.
-import { generateCaption } from './generate-instagram-caption';
+import { generateCaption } from './generate-post-caption';
 import { suggestHashtags } from './suggest-relevant-hashtags';
 import { generateImagePrompt } from './generate-gemini-nano-prompt';
 
