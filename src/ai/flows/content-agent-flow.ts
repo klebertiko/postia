@@ -17,7 +17,9 @@ import { z } from 'genkit';
 // Cada ferramenta é um agente especializado em uma tarefa.
 import { captionGeneratorTool } from './generate-instagram-caption';
 import { hashtagSuggesterTool } from './suggest-relevant-hashtags';
-import { imagePromptGeneratorTool } from './generate-gemini-nano-prompt';
+// O agente de prompt de imagem agora é um fluxo que pode usar suas próprias ferramentas.
+// A função exportada `generateImagePrompt` é o que chamamos.
+import { generateImagePrompt } from './generate-gemini-nano-prompt';
 
 // Esquema de entrada para o fluxo principal: o tópico do post.
 const GeneratePostContentInputSchema = z.object({
@@ -43,46 +45,16 @@ export type GeneratePostContentOutput = z.infer<
 export async function generatePostContent(
   input: GeneratePostContentInput
 ): Promise<GeneratePostContentOutput> {
-  return contentAgentFlow(input);
+  // Chama os agentes em paralelo para otimizar o tempo de resposta.
+  const [captionResult, hashtagResult, imagePromptResult] = await Promise.all([
+    captionGeneratorTool({ topic: input.postTopic }),
+    hashtagSuggesterTool({ topic: input.postTopic }),
+    generateImagePrompt({ topic: input.postTopic }), // Chama a função do fluxo de imagem
+  ]);
+
+  return {
+    caption: captionResult.caption,
+    hashtags: hashtagResult.hashtags,
+    imagePrompt: imagePromptResult.imagePrompt,
+  };
 }
-
-// Define o fluxo principal do agente usando `ai.defineFlow`.
-const contentAgentFlow = ai.defineFlow(
-  {
-    name: 'contentAgentFlow',
-    inputSchema: GeneratePostContentInputSchema,
-    outputSchema: GeneratePostContentOutputSchema,
-  },
-  // A função assíncrona que define a lógica do agente orquestrador.
-  async input => {
-    // Define o prompt para o agente principal (orquestrador).
-    // Este prompt instrui o agente sobre seu objetivo e como usar as ferramentas disponíveis.
-    const prompt = `Você é um agente de IA assistente de marketing de mídia social.
-Sua tarefa é gerar o conteúdo completo para um post de Instagram com base em um tópico fornecido pelo usuário.
-Você DEVE usar as ferramentas disponíveis para gerar a legenda, as hashtags e um prompt de imagem.
-NÃO invente o conteúdo, use as ferramentas para cada parte da tarefa.
-
-Tópico do Post: ${input.postTopic}`;
-
-    // Executa o modelo de IA com o prompt e as ferramentas.
-    // O modelo decidirá quais ferramentas chamar com base no prompt.
-    // O `await` aqui espera a conclusão de toda a orquestração, incluindo as chamadas às ferramentas.
-    const result = await ai.generate({
-      prompt: prompt,
-      // Fornece a lista de ferramentas que este agente pode usar.
-      tools: [
-        captionGeneratorTool,
-        hashtagSuggesterTool,
-        imagePromptGeneratorTool,
-      ],
-      // Define o formato de saída esperado para o resultado final.
-      output: {
-        schema: GeneratePostContentOutputSchema,
-      },
-    });
-
-    // Retorna a saída final estruturada, que o modelo montou após usar as ferramentas.
-    // CORREÇÃO: Usar `result.output` em vez de `result.output()`.
-    return result.output!;
-  }
-);

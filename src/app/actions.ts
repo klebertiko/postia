@@ -20,8 +20,7 @@ export async function generateContentAction(
   const { postTopic } = validation.data;
 
   try {
-    // Agora, chamamos apenas o fluxo principal do agente orquestrador.
-    // Ele cuidará de chamar os outros agentes para gerar o conteúdo.
+    // A função `generatePostContent` agora orquestra as chamadas em paralelo.
     const result = await generatePostContent({ postTopic });
 
     if (!result?.caption || !result?.hashtags || !result?.imagePrompt) {
