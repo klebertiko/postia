@@ -1,56 +1,71 @@
 'use server';
 
 /**
- * @fileOverview Ferramenta de IA (agente) especializada em sugerir hashtags para o Instagram.
+ * @fileOverview Agente de IA especializado em sugerir hashtags para o Instagram.
  *
- * Este arquivo define uma "ferramenta" que o agente principal pode usar.
- * Esta ferramenta recebe um tópico e retorna uma lista de hashtags relevantes.
+ * Este arquivo define um fluxo (flow) que usa uma ferramenta de busca para encontrar
+ * termos relevantes e, em seguida, sugere uma lista de hashtags otimizadas.
  *
- * - hashtagSuggesterTool - A ferramenta que pode ser chamada por outros agentes.
+ * - suggestHashtags - A função que pode ser chamada por outros agentes.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { googleSearchTool } from '../tools/google-search-tool';
 
-// Esquema de entrada para a ferramenta: o tópico do post.
+// Esquema de entrada para o fluxo: o tópico do post.
 const HashtagInputSchema = z.object({
   topic: z
     .string()
     .describe('O tópico para o qual as hashtags devem ser sugeridas.'),
 });
+export type HashtagInput = z.infer<typeof HashtagInputSchema>;
 
-// Esquema de saída da ferramenta: uma lista de hashtags.
+// Esquema de saída do fluxo: uma lista de hashtags.
 const HashtagOutputSchema = z.object({
   hashtags: z
     .array(z.string())
     .describe('Uma lista de hashtags relevantes para o tópico.'),
 });
+export type HashtagOutput = z.infer<typeof HashtagOutputSchema>;
 
-// Definimos a ferramenta usando `ai.defineTool`.
-// Esta é a unidade de trabalho que nosso agente principal irá acionar.
-export const hashtagSuggesterTool = ai.defineTool(
+// Função de invólucro (wrapper) que será chamada por outros agentes.
+export async function suggestHashtags(
+  input: HashtagInput
+): Promise<HashtagOutput> {
+  return hashtagSuggesterFlow(input);
+}
+
+
+// Define o fluxo do agente que agora pode usar ferramentas.
+export const hashtagSuggesterFlow = ai.defineFlow(
   {
-    name: 'hashtagSuggester',
-    description:
-      'Sugere uma lista de hashtags relevantes para o Instagram com base em um tópico de postagem. Não inclua o caractere #.',
+    name: 'hashtagSuggesterFlow',
     inputSchema: HashtagInputSchema,
     outputSchema: HashtagOutputSchema,
   },
-  // A função assíncrona que executa a lógica da ferramenta.
   async input => {
     // Define o prompt que será enviado ao modelo de IA.
-    // O `output` com `schema: HashtagOutputSchema` instrui o modelo a retornar um JSON formatado.
-    const result = await ai.generate({
-      prompt: `Você é um especialista em marketing de mídia social para o Instagram.
-Dado o seguinte tópico de postagem, sugira uma lista de hashtags relevantes. Não inclua o caractere '#' na resposta.
+    const prompt = `Você é um especialista em marketing de SEO e mídia social para o Instagram.
+Sua tarefa é sugerir uma lista de hashtags relevantes e eficazes.
 
-Tópico da postagem: ${input.topic}`,
+**Processo Obrigatório:**
+1.  Analise o tópico: "${input.topic}".
+2.  Use a ferramenta 'googleSearchTool' para pesquisar o tópico e identificar palavras-chave, nichos, comunidades ou termos populares relacionados.
+3.  Com base nos resultados da busca, crie uma lista de hashtags. Combine hashtags populares com hashtags de nicho para maximizar o alcance.
+4.  Não inclua o caractere '#' na resposta.
+
+Gere a lista de hashtags AGORA, seguindo rigorosamente o processo.`;
+
+    // Executa o modelo de IA, fornecendo a ferramenta de busca.
+    const result = await ai.generate({
+      prompt: prompt,
+      model: 'googleai/gemini-2.5-flash',
+      tools: [googleSearchTool],
       output: {
         schema: HashtagOutputSchema,
       },
     });
 
-    // Retorna o resultado no formato definido pelo `outputSchema`.
-    // CORREÇÃO: Usar `result.output` em vez de `result.output()`.
     return result.output!;
   }
 );

@@ -58,7 +58,7 @@ Esses arquivos definem a estrutura e as dependências do nosso projeto.
 
 ### 2. A Arquitetura de IA com Genkit (`src/ai/...`)
 
-Esta é a parte mais mágica do projeto. Usamos uma **arquitetura de múltiplos agentes**, onde cada "agente" é uma ferramenta ou fluxo especializado.
+Esta é a parte mais mágica do projeto. Usamos uma **arquitetura de múltiplos agentes**, onde cada "agente" é um fluxo especializado que pode usar ferramentas.
 
 #### `src/ai/genkit.ts`
 
@@ -82,15 +82,15 @@ export const ai = genkit({
 ```
 -   **Explicação:** Nós inicializamos o Genkit, dizemos a ele para usar o plugin `googleAI` e fornecemos nossa chave de API a partir das variáveis de ambiente (`process.env.GEMINI_API_KEY`). Isso funciona tanto localmente (com o arquivo `.env`) quanto na Vercel (com as variáveis de ambiente configuradas no painel).
 
-#### A Estratégia dos Múltiplos Agentes
+#### A Estratégia dos Múltiplos Agentes Pesquisadores
 
-Em vez de um único prompt gigante tentando fazer tudo, nós criamos "ferramentas" e "fluxos" menores e focados:
+Em vez de um único prompt gigante tentando fazer tudo, nós criamos "fluxos" focados que se comportam como agentes pesquisadores.
 
-1.  **Agente de Legenda** (`generate-instagram-caption.ts`): Especialista em criar textos de posts.
-2.  **Agente de Hashtags** (`suggest-relevant-hashtags.ts`): Especialista em marketing e SEO de hashtags.
-3.  **Ferramenta de Busca** (`google-search-tool.ts`): Uma ferramenta que simula uma busca na web para verificar fatos.
-4.  **Agente de Prompt de Imagem** (`generate-gemini-nano-prompt.ts`): Um engenheiro de prompt sênior que agora **usa a ferramenta de busca** para garantir a segurança dos elementos no prompt.
-5.  **Agente de Conteúdo** (`content-agent-flow.ts`): O orquestrador que coordena todos os outros.
+1.  **Ferramenta de Busca (`google-search-tool.ts`)**: A base de tudo. Uma ferramenta que permite que nossos agentes busquem informações na web.
+2.  **Agente de Legenda (`generate-instagram-caption.ts`)**: Especialista em criar textos. Agora, ele primeiro **pesquisa** o tópico para obter contexto antes de escrever.
+3.  **Agente de Hashtags (`suggest-relevant-hashtags.ts`)**: Especialista em marketing. Ele **pesquisa** o tópico para encontrar tendências e palavras-chave antes de sugerir as hashtags.
+4.  **Agente de Prompt de Imagem (`generate-gemini-nano-prompt.ts`)**: Um engenheiro de prompt sênior que **usa a ferramenta de busca** para garantir a segurança dos elementos no prompt.
+5.  **Agente de Conteúdo (`content-agent-flow.ts`)**: O orquestrador que coordena todos os outros agentes pesquisadores.
 
 #### `src/ai/tools/google-search-tool.ts` (A Ferramenta de Busca)
 
@@ -126,11 +126,12 @@ export const googleSearchTool = ai.defineTool(
 -   **Explicação:** Nós definimos uma `googleSearchTool` que um modelo de IA pode usar. A `description` é crucial, pois é como o modelo sabe *quando* e *para que* usar a ferramenta. Por enquanto, a busca é simulada, mas ela já demonstra o conceito de dar ao agente a capacidade de buscar informações externas para tomar decisões mais seguras.
 
 
-#### `src/ai/flows/generate-gemini-nano-prompt.ts` (O Agente Pesquisador)
+#### Os Agentes Pesquisadores (`generate-instagram-caption.ts`, `suggest-relevant-hashtags.ts`, `generate-gemini-nano-prompt.ts`)
 
-Este agente foi promovido. Antes era uma simples ferramenta, agora é um `Flow` (fluxo) que pode usar outras ferramentas.
+Todos os nossos agentes agora seguem um padrão similar. Eles são `Flows` (fluxos) que podem usar ferramentas. Vamos ver o exemplo do agente de legenda:
 
 ```typescript
+// Em src/ai/flows/generate-instagram-caption.ts
 'use server';
 // ... imports ...
 import { googleSearchTool } from '../tools/google-search-tool';
@@ -138,33 +139,32 @@ import { googleSearchTool } from '../tools/google-search-tool';
 // ... esquemas de entrada e saída ...
 
 // Define o fluxo do agente que agora pode usar ferramentas.
-const imagePromptFlow = ai.defineFlow(
+const captionGeneratorFlow = ai.defineFlow(
   {
-    name: 'imagePromptGeneratorFlow',
+    name: 'captionGeneratorFlow',
     // ... schemas ...
   },
   async input => {
     // O prompt foi atualizado para ser muito mais explícito.
-    const prompt = `Você é um Engenheiro de Prompt Sênior e um especialista em pesquisa de segurança.
+    const prompt = `Você é um especialista em marketing...
 **Processo Obrigatório:**
 1. Analise o tópico: "${input.topic}".
-2. Para CADA elemento que você pretende incluir..., você DEVE USAR a ferramenta 'googleSearchTool' para fazer uma pergunta específica sobre sua segurança.
-3. Construa uma lista de elementos POSITIVOS E COMPROVADAMENTE SEGUROS com base nas respostas da busca.
-...`;
+2. Use a ferramenta 'googleSearchTool' para obter contexto, fatos interessantes...
+3. Com base nos resultados da busca, escreva uma legenda...`;
 
     // Executa o modelo de IA, fornecendo a ferramenta de busca.
     const result = await ai.generate({
       prompt: prompt,
       model: 'googleai/gemini-2.5-flash', // Um modelo capaz de usar ferramentas
       tools: [googleSearchTool], // Aqui está a mágica: damos a ferramenta ao agente!
-      output: { schema: ImagePromptOutputSchema },
+      output: { schema: CaptionOutputSchema },
     });
 
     return result.output!;
   }
 );
 ```
--   **Explicação:** O `imagePromptFlow` agora é um `ai.defineFlow`. Ao gerar o conteúdo, nós passamos a `googleSearchTool` no array de `tools`. O prompt instrui o modelo de IA a **obrigatoriamente** usar essa ferramenta para verificar cada item antes de adicioná-lo ao prompt de imagem final. Isso resolve o problema de segurança que encontramos (como o da alface romana) de uma forma robusta.
+-   **Explicação do Padrão:** Cada um dos nossos agentes (legenda, hashtags, prompt de imagem) agora tem um `prompt` que instrui o modelo de IA a **obrigatoriamente** usar a `googleSearchTool` para pesquisar sobre o tópico. Ao chamar `ai.generate`, passamos a `googleSearchTool` no array de `tools`. Isso dá superpoderes aos nossos agentes, permitindo que eles gerem conteúdo baseado em informações "frescas" da web (mesmo que simuladas por enquanto).
 
 
 #### `src/ai/flows/content-agent-flow.ts` (O Agente Chefe)
@@ -174,8 +174,8 @@ O orquestrador foi simplificado. Em vez de gerenciar várias ferramentas, ele ag
 ```typescript
 'use server';
 // ... imports ...
-import { captionGeneratorTool } from './generate-instagram-caption';
-import { hashtagSuggesterTool } from './suggest-relevant-hashtags';
+import { generateCaption } from './generate-instagram-caption';
+import { suggestHashtags } from './suggest-relevant-hashtags';
 import { generateImagePrompt } from './generate-gemini-nano-prompt';
 
 // ... esquemas de entrada e saída com Zod ...
@@ -185,8 +185,8 @@ export async function generatePostContent(
 ): Promise<GeneratePostContentOutput> {
   // Chama os agentes em paralelo para otimizar o tempo de resposta.
   const [captionResult, hashtagResult, imagePromptResult] = await Promise.all([
-    captionGeneratorTool({ topic: input.postTopic }),
-    hashtagSuggesterTool({ topic: input.postTopic }),
+    generateCaption({ topic: input.postTopic }),
+    suggestHashtags({ topic: input.postTopic }),
     generateImagePrompt({ topic: input.postTopic }), // Chama a função exportada do fluxo de imagem
   ]);
 

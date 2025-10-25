@@ -1,56 +1,72 @@
 'use server';
 
 /**
- * @fileOverview Ferramenta de IA (agente) especializada em criar legendas para o Instagram.
+ * @fileOverview Agente de IA especializado em criar legendas para o Instagram.
  *
- * Este arquivo define uma "ferramenta" que o agente principal pode usar.
- * Esta ferramenta recebe um tópico e retorna uma legenda de post envolvente.
+ * Este arquivo define um fluxo (flow) que usa uma ferramenta de busca para obter
+ * contexto sobre um tópico e, em seguida, gera uma legenda de post envolvente.
  *
- * - captionGeneratorTool - A ferramenta que pode ser chamada por outros agentes.
+ * - generateCaption - A função que pode ser chamada por outros agentes.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { googleSearchTool } from '../tools/google-search-tool';
 
-// Esquema de entrada para a ferramenta: o tópico do post.
+// Esquema de entrada para o fluxo: o tópico do post.
 const CaptionInputSchema = z.object({
   topic: z
     .string()
     .describe('O tópico para o qual a legenda deve ser criada.'),
 });
+export type CaptionInput = z.infer<typeof CaptionInputSchema>;
 
-// Esquema de saída da ferramenta: a legenda gerada.
+// Esquema de saída do fluxo: a legenda gerada.
 const CaptionOutputSchema = z.object({
   caption: z
     .string()
     .describe('A legenda do Instagram gerada para o tópico fornecido.'),
 });
+export type CaptionOutput = z.infer<typeof CaptionOutputSchema>;
 
-// Definimos a ferramenta usando `ai.defineTool`.
-// Esta é a unidade de trabalho que nosso agente principal irá acionar.
-export const captionGeneratorTool = ai.defineTool(
+// Função de invólucro (wrapper) que será chamada por outros agentes.
+export async function generateCaption(
+  input: CaptionInput
+): Promise<CaptionOutput> {
+  return captionGeneratorFlow(input);
+}
+
+// Define o fluxo do agente que agora pode usar ferramentas.
+const captionGeneratorFlow = ai.defineFlow(
   {
-    name: 'captionGenerator',
-    description:
-      'Gera uma legenda de postagem do Instagram envolvente com base em um tópico. A legenda não deve conter hashtags e deve terminar com uma chamada para ação (CTA) relevante.',
+    name: 'captionGeneratorFlow',
     inputSchema: CaptionInputSchema,
     outputSchema: CaptionOutputSchema,
   },
-  // A função assíncrona que executa a lógica da ferramenta.
   async input => {
-    // Define o prompt que será enviado ao modelo de IA.
+    // Define o prompt para o agente de legenda.
+    // Ele agora tem a responsabilidade de usar a ferramenta de busca.
     const prompt = `Você é um especialista em marketing de mídia social para o Instagram.
-Gere uma legenda envolvente e relevante para o Instagram com base no seguinte tópico de postagem. Mantenha a legenda abaixo do limite de caracteres do Instagram.
-NÃO inclua hashtags na legenda. A legenda DEVE terminar com uma chamada para ação (CTA) clara e relevante para o tópico.
+Sua tarefa é criar uma legenda envolvente e relevante.
 
-Tópico da postagem: ${input.topic}`;
+**Processo Obrigatório:**
+1.  Analise o tópico: "${input.topic}".
+2.  Use a ferramenta 'googleSearchTool' para obter contexto, fatos interessantes ou pontos de vista atuais sobre o tópico.
+3.  Com base nos resultados da busca, escreva uma legenda cativante e informativa.
+4.  A legenda NÃO deve conter hashtags.
+5.  A legenda DEVE terminar com uma chamada para ação (CTA) clara e relevante para o tópico.
 
-    // Chama o modelo de IA com o prompt.
-    const { text } = await ai.generate({
+Gere a legenda AGORA, seguindo rigorosamente o processo.`;
+
+    // Executa o modelo de IA, fornecendo a ferramenta de busca.
+    const result = await ai.generate({
       prompt: prompt,
+      model: 'googleai/gemini-2.5-flash',
+      tools: [googleSearchTool],
+      output: {
+        schema: CaptionOutputSchema,
+      },
     });
-    
-    // Retorna o resultado no formato definido pelo `outputSchema`.
-    // CORREÇÃO: Usar `text` diretamente em vez de `text()`.
-    return { caption: text };
+
+    return result.output!;
   }
 );

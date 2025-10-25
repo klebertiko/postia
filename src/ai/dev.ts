@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 config();
 
 // Importamos os fluxos e ferramentas.
-// O content-agent-flow foi simplificado, e os outros são suas dependências.
+// Todos os agentes agora são fluxos que podem usar a ferramenta de busca.
 import '@/ai/flows/content-agent-flow';
 import '@/ai/flows/generate-gemini-nano-prompt';
 import '@/ai/flows/generate-instagram-caption';

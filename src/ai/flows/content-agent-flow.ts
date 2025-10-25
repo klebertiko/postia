@@ -4,7 +4,7 @@
  * @fileOverview Fluxo principal do agente orquestrador de conteúdo.
  *
  * Este arquivo define o agente principal que orquestra a geração de conteúdo para um post de Instagram.
- * Ele utiliza "ferramentas" (outros agentes especializados) para gerar a legenda, as hashtags e o prompt de imagem.
+ * Ele chama outros agentes especializados (fluxos) para gerar a legenda, as hashtags e o prompt de imagem.
  *
  * - generatePostContent - A função principal que inicia o processo de geração.
  * - GeneratePostContentInput - O tipo de entrada para a função.
@@ -13,12 +13,9 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-// Importa as ferramentas que o agente principal irá usar.
-// Cada ferramenta é um agente especializado em uma tarefa.
-import { captionGeneratorTool } from './generate-instagram-caption';
-import { hashtagSuggesterTool } from './suggest-relevant-hashtags';
-// O agente de prompt de imagem agora é um fluxo que pode usar suas próprias ferramentas.
-// A função exportada `generateImagePrompt` é o que chamamos.
+// Importa as funções exportadas dos fluxos especializados.
+import { generateCaption } from './generate-instagram-caption';
+import { suggestHashtags } from './suggest-relevant-hashtags';
 import { generateImagePrompt } from './generate-gemini-nano-prompt';
 
 // Esquema de entrada para o fluxo principal: o tópico do post.
@@ -47,9 +44,9 @@ export async function generatePostContent(
 ): Promise<GeneratePostContentOutput> {
   // Chama os agentes em paralelo para otimizar o tempo de resposta.
   const [captionResult, hashtagResult, imagePromptResult] = await Promise.all([
-    captionGeneratorTool({ topic: input.postTopic }),
-    hashtagSuggesterTool({ topic: input.postTopic }),
-    generateImagePrompt({ topic: input.postTopic }), // Chama a função do fluxo de imagem
+    generateCaption({ topic: input.postTopic }),
+    suggestHashtags({ topic: input.postTopic }),
+    generateImagePrompt({ topic: input.postTopic }),
   ]);
 
   return {
