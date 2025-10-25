@@ -251,10 +251,16 @@ export default function Home() {
 }
 ```
 
--   **Explicação:**
+-   **Explicação do Código:**
     -   `'use client'` no topo indica que este é um Componente de Cliente, que pode usar interatividade e estado (hooks como `useState`).
     -   `useState` é um "gancho" (hook) do React para guardar informações que mudam, como o conteúdo gerado (`generatedContent`) e o estado de carregamento (`isLoading`).
     -   `handleFormSubmit` é a função que orquestra a interação: define o carregamento, chama a IA através da `generateContentAction`, e atualiza a tela com o resultado ou um erro.
+
+-   **Explicação do Estilo (Classes Tailwind):**
+    -   `flex min-h-screen w-full flex-col`: Estamos usando Flexbox para organizar a página. `flex-col` empilha os elementos verticalmente. `min-h-screen` garante que o contêiner principal ocupe pelo menos 100% da altura da tela, e `w-full` que ocupe 100% da largura. Isso faz com que o rodapé fique no final da página, mesmo em telas com pouco conteúdo.
+    -   `container mx-auto px-4`: `container` é uma classe do Tailwind que centraliza o conteúdo e define uma largura máxima. `mx-auto` centraliza o container horizontalmente, e `px-4` adiciona um espaçamento (`padding`) horizontal para que o conteúdo não cole nas bordas da tela.
+    -   `text-center mb-8 md:mb-12`: `text-center` alinha o texto ao centro. `mb-8` adiciona uma margem inferior (`margin-bottom`), e `md:mb-12` é um **modificador responsivo**: em telas de tamanho médio (`md`) ou maiores, a margem será maior (`12` em vez de `8`), criando um layout mais arejado em telas grandes.
+    -   `font-headline text-4xl sm:text-5xl`: `font-headline` aplica nossa fonte customizada 'Poppins'. `text-4xl` define um tamanho de fonte grande, e `sm:text-5xl` a torna ainda maior em telas pequenas (`sm`) e acima, garantindo boa legibilidade em qualquer dispositivo.
 
 #### `src/app/actions.ts` (A Ponte para a IA)
 
@@ -311,12 +317,21 @@ Aqui detalhamos os componentes que criamos especificamente para o PostIA.
     -   **Tecnologias:** Usamos `react-hook-form` para gerenciar o estado do formulário de forma eficiente e `zod` com `@hookform/resolvers/zod` para criar um esquema de validação robusto. Isso garante que o usuário não possa enviar um tópico vazio ou muito curto, por exemplo.
     -   **Props (Propriedades):** Ele recebe duas props da página principal: `onSubmit` (a função que será chamada quando o formulário for enviado com sucesso) e `isLoading` (um booleano que nos diz se a IA está processando).
     -   **Funcionalidade:** Quando o botão "Gerar Conteúdo Mágico" é clicado, `react-hook-form` valida os dados. Se forem válidos, ele chama a função `onSubmit` passando o tópico. A prop `isLoading` é usada para desabilitar o botão e mostrar um ícone de carregamento (`Loader2`), prevenindo envios duplicados e dando feedback visual ao usuário.
-    -   **UI:** O componente é estilizado usando componentes `shadcn/ui` como `Card`, `Form`, `FormLabel`, `Input` e `Button`, garantindo consistência visual com o resto do app.
+    -   **Estilo (Classes Tailwind):**
+        -   `space-y-6`: Adiciona um espaço vertical uniforme entre todos os elementos filhos diretos do formulário (o campo de input e o botão), criando um ritmo visual agradável.
+        -   `flex justify-end`: Transforma o contêiner do botão em um container flexbox e alinha seu conteúdo (`Button`) à direita (`justify-end`).
+        -   `animate-spin`: Classe utilitária do Tailwind que aplica uma animação de rotação contínua. Nós a usamos no ícone `Loader2` para indicar claramente que algo está acontecendo.
+        -   `hover:bg-primary/90`: Um modificador de estado. Ele diz: "quando o mouse estiver sobre este elemento (`hover:`), aplique a classe `bg-primary/90` (a cor de fundo primária com 90% de opacidade)". Isso cria o efeito visual de feedback quando o usuário passa o mouse sobre o botão.
 
 -   **`generated-content.tsx`**: Este componente é responsável por exibir os resultados da IA de forma clara e organizada.
     -   **Props:** Ele recebe uma única prop, `content`, que é um objeto contendo a legenda (`caption`), as hashtags (`hashtags`) e o prompt de imagem (`prompt`) gerados.
-    -   **Estrutura:** O conteúdo é dividido em três seções, cada uma dentro de um componente `ContentCard` customizado. Isso torna o layout modular e fácil de ler. Usamos `Badge` para exibir as hashtags e `whitespace-pre-wrap` para que a quebra de linha da legenda seja respeitada.
-    -   **Componente Filho:** Ele utiliza nosso `copy-button.tsx` em cada card para permitir que o usuário copie facilmente cada parte do conteúdo.
+    -   **Estrutura:** O conteúdo é dividido em três seções, cada uma dentro de um componente `ContentCard` customizado. Isso torna o layout modular e fácil de ler.
+    -   **Estilo (Classes Tailwind):**
+        -   `space-y-8`: Similar ao `space-y-6` do formulário, mas com um espaço maior para separar visualmente cada `ContentCard`.
+        -   `animate-in fade-in-50 duration-500`: Um conjunto de classes de animação. Quando o componente aparece, ele terá um efeito de "fade-in" (aparecer suavemente) com uma duração de 500ms.
+        -   `flex flex-wrap gap-2`: Usado no contêiner das hashtags. `flex-wrap` permite que as hashtags quebrem para a próxima linha se não couberem todas em uma só. `gap-2` adiciona um pequeno espaço entre cada hashtag.
+        -   `whitespace-pre-wrap`: Uma classe muito útil! Ela diz ao navegador para respeitar as quebras de linha e os espaços que vêm do texto da legenda gerada pela IA, exibindo a formatação exatamente como foi criada.
+        -   `font-mono`: Aplica uma fonte monoespaçada ao prompt de imagem, dando a ele uma aparência de "código" ou texto técnico, o que é apropriado.
 
 -   **`copy-button.tsx`**: Um pequeno mas poderoso componente de usabilidade.
     -   **Funcionalidade:** Ele recebe uma prop `textToCopy`. Ao ser clicado, ele usa a API do navegador `navigator.clipboard.writeText()` para copiar o texto para a área de transferência do usuário.
