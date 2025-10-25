@@ -88,7 +88,7 @@ Em vez de um único prompt gigante tentando fazer tudo, nós criamos "fluxos" (f
 
 1.  **Agente de Legenda (`generate-post-caption.ts`)**: Especialista em criar textos cativantes com uma chamada para ação.
 2.  **Agente de Hashtags (`suggest-relevant-hashtags.ts`)**: Especialista em marketing, focado em sugerir as melhores hashtags para alcance.
-3.  **Agente de Prompt de Imagem (`generate-gemini-nano-prompt.ts`)**: Um engenheiro de prompt sênior que cria prompts de imagem detalhados e seguros.
+3.  **Agente de Prompt de Imagem (`generate-image-prompt.ts`)**: Um engenheiro de prompt sênior que cria prompts de imagem detalhados e seguros.
 4.  **Agente de Conteúdo (`content-agent-flow.ts`)**: O orquestrador que coordena todos os outros agentes para gerar o pacote de conteúdo completo.
 
 #### `src/ai/flows/content-agent-flow.ts` (O Agente Chefe)
@@ -100,7 +100,7 @@ O orquestrador chama cada agente especializado em paralelo e aguarda os resultad
 // ... imports ...
 import { generateCaption } from './generate-post-caption';
 import { suggestHashtags } from './suggest-relevant-hashtags';
-import { generateImagePrompt } from './generate-gemini-nano-prompt';
+import { generateImagePrompt } from './generate-image-prompt';
 
 // ... esquemas de entrada e saída com Zod ...
 
