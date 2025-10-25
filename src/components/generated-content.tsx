@@ -10,7 +10,7 @@ interface GeneratedContentProps {
 }
 
 const imageGenerators = [
-  { name: 'Gemini', url: 'https://aistudio.google.com/' },
+  { name: 'Gemini', url: 'https://gemini.google.com/' },
   { name: 'Microsoft Designer', url: 'https://designer.microsoft.com/image-creator' },
   { name: 'Leonardo.Ai', url: 'https://leonardo.ai/' },
   { name: 'Ideogram', url: 'https://ideogram.ai/' },
