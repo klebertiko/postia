@@ -38,14 +38,14 @@ export const imagePromptGeneratorTool = ai.defineTool(
   // Ela usa um prompt do Genkit para chamar o modelo de IA.
   async input => {
     // Define o prompt que será enviado ao modelo de IA.
-    const prompt = `Você é um Engenheiro de Prompt Sênior, especialista em gerar prompts para imagens que sejam seguros, precisos, de alta qualidade e adequados para mídias sociais.
+    const prompt = `Você é um Engenheiro de Prompt Sênior e um especialista em pesquisa de segurança, responsável por criar prompts para modelos de geração de imagem. Sua principal diretriz é a segurança e a precisão factual absoluta.
 
-Sua tarefa é criar um prompt detalhado e estruturado para um modelo de geração de imagem, baseado em um tópico, garantindo que a representação visual seja sempre segura e apropriada.
+Sua tarefa é criar um prompt detalhado e estruturado em português do Brasil, garantindo que a representação visual seja segura, apropriada e factualmente correta.
 
-**Diretrizes de Segurança e Precisão (Regra Principal):**
-1.  **Segurança em Primeiro Lugar:** Garanta que todos os elementos visuais representados na imagem sejam seguros, apropriados e factualmente corretos dentro do contexto da cena.
-2.  **Especificidade para Segurança:** Ao lidar com categorias onde a segurança é crucial (ex: alimentação, acessórios, plantas, produtos de saúde), você DEVE substituir descrições genéricas por uma lista específica e verificada de elementos POSITIVOS e SEGUROS.
-3.  **Reforço Positivo e Negativo:** Combine a lista de itens seguros (o que incluir) com uma instrução negativa generalizada para evitar perigos (ex: 'evitar elementos perigosos ou impróprios').
+**Diretrizes de Segurança e Precisão (Regra Inviolável):**
+1.  **Factualidade Absoluta:** Antes de incluir qualquer elemento, especialmente em categorias de risco, você deve agir como se tivesse consultado uma fonte de conhecimento confiável (como um veterinário, botânico ou especialista em segurança alimentar). Inclua APENAS itens sobre os quais você tem **alta certeza** de que são seguros e apropriados para o contexto.
+2.  **Especificidade para Segurança:** Ao lidar com tópicos onde a segurança é crucial (ex: alimentação de animais, produtos para bebês, plantas, alimentos), você DEVE substituir descrições genéricas por uma lista específica e verificada de elementos POSITIVOS e COMPROVADAMENTE SEGUROS. Se houver dúvida sobre um item, NÃO o inclua.
+3.  **Reforço Positivo e Negativo:** Combine a lista de itens seguros (o que incluir) com uma instrução negativa clara e abrangente para evitar perigos (ex: 'evitar todos os alimentos tóxicos para a espécie, como...').
 
 **Estrutura do Prompt de Saída:**
 O prompt final deve ser uma única linha de texto em português do Brasil, separando os conceitos por vírgulas. Siga esta estrutura:
@@ -54,7 +54,7 @@ O prompt final deve ser uma única linha de texto em português do Brasil, separ
 3.  **Iluminação:** Detalhe a iluminação (ex: luz natural suave, iluminação de estúdio dramática).
 4.  **Cores e Paleta:** Sugira uma paleta de cores (ex: tons pastéis, cores vibrantes, monocromático).
 5.  **Composição:** Indique o enquadramento (ex: close-up, plano médio, vista de cima).
-6.  **Detalhes Adicionais:** Adicione elementos específicos e seguros que enriqueçam a cena.
+6.  **Detalhes Adicionais (Seguros):** Adicione elementos específicos e comprovadamente seguros que enriqueçam a cena.
 7.  **Negativos:** Liste de forma geral os elementos a serem evitados para garantir a segurança (ex: evitar objetos cortantes, plantas venenosas, alimentos inseguros).
 
 **Tópico do Post:** ${input.topic}
