@@ -58,7 +58,7 @@ Esses arquivos definem a estrutura e as dependências do nosso projeto.
 
 ### 2. A Arquitetura de IA com Genkit (`src/ai/...`)
 
-Esta é a parte mais mágica do projeto. Usamos uma **arquitetura de múltiplos agentes**, onde cada "agente" é um fluxo especializado que pode usar ferramentas.
+Esta é a parte mágica do projeto. Usamos uma **arquitetura de múltiplos agentes**, onde cada "agente" é um fluxo de IA especializado em uma tarefa.
 
 #### `src/ai/genkit.ts`
 
@@ -82,94 +82,18 @@ export const ai = genkit({
 ```
 -   **Explicação:** Nós inicializamos o Genkit, dizemos a ele para usar o plugin `googleAI` e fornecemos nossa chave de API a partir das variáveis de ambiente (`process.env.GEMINI_API_KEY`). Isso funciona tanto localmente (com o arquivo `.env`) quanto na Vercel (com as variáveis de ambiente configuradas no painel).
 
-#### A Estratégia dos Múltiplos Agentes Pesquisadores
+#### A Estratégia dos Múltiplos Agentes
 
-Em vez de um único prompt gigante tentando fazer tudo, nós criamos "fluxos" focados que se comportam como agentes pesquisadores.
+Em vez de um único prompt gigante tentando fazer tudo, nós criamos "fluxos" (flows) focados, que se comportam como agentes especializados:
 
-1.  **Ferramenta de Busca (`google-search-tool.ts`)**: A base de tudo. Uma ferramenta que permite que nossos agentes busquem informações na web.
-2.  **Agente de Legenda (`generate-instagram-caption.ts`)**: Especialista em criar textos. Agora, ele primeiro **pesquisa** o tópico para obter contexto antes de escrever.
-3.  **Agente de Hashtags (`suggest-relevant-hashtags.ts`)**: Especialista em marketing. Ele **pesquisa** o tópico para encontrar tendências e palavras-chave antes de sugerir as hashtags.
-4.  **Agente de Prompt de Imagem (`generate-gemini-nano-prompt.ts`)**: Um engenheiro de prompt sênior que **usa a ferramenta de busca** para garantir a segurança dos elementos no prompt.
-5.  **Agente de Conteúdo (`content-agent-flow.ts`)**: O orquestrador que coordena todos os outros agentes pesquisadores.
-
-#### `src/ai/tools/google-search-tool.ts` (A Ferramenta de Busca)
-
-Este é um novo tipo de arquivo: uma **ferramenta**. Uma ferramenta é uma função que um agente de IA pode decidir chamar para obter informações externas.
-
-```typescript
-'use server';
-// ... imports ...
-
-// Definimos a ferramenta de busca usando `ai.defineTool`.
-export const googleSearchTool = ai.defineTool(
-  {
-    name: 'googleSearchTool',
-    description: 'Realiza uma busca na web para responder a uma pergunta...',
-    inputSchema: SearchInputSchema,
-    outputSchema: SearchOutputSchema,
-  },
-  async (input) => {
-    console.log(`🔎 Realizando busca simulada por: "${input.query}"`);
-
-    // **Simulação de Respostas da API de Busca**
-    // Em um app real, aqui você chamaria uma API de busca de verdade.
-    const query = input.query.toLowerCase();
-    if (query.includes('alface romana') && query.includes('porquinho da índia')) {
-      return "Não, alface romana não é segura...";
-    }
-    // ... outras respostas simuladas ...
-
-    return `Resultado da busca para "${input.query}": (Resposta simulada).`;
-  }
-);
-```
--   **Explicação:** Nós definimos uma `googleSearchTool` que um modelo de IA pode usar. A `description` é crucial, pois é como o modelo sabe *quando* e *para que* usar a ferramenta. Por enquanto, a busca é simulada, mas ela já demonstra o conceito de dar ao agente a capacidade de buscar informações externas para tomar decisões mais seguras.
-
-
-#### Os Agentes Pesquisadores (`generate-instagram-caption.ts`, `suggest-relevant-hashtags.ts`, `generate-gemini-nano-prompt.ts`)
-
-Todos os nossos agentes agora seguem um padrão similar. Eles são `Flows` (fluxos) que podem usar ferramentas. Vamos ver o exemplo do agente de legenda:
-
-```typescript
-// Em src/ai/flows/generate-instagram-caption.ts
-'use server';
-// ... imports ...
-import { googleSearchTool } from '../tools/google-search-tool';
-
-// ... esquemas de entrada e saída ...
-
-// Define o fluxo do agente que agora pode usar ferramentas.
-const captionGeneratorFlow = ai.defineFlow(
-  {
-    name: 'captionGeneratorFlow',
-    // ... schemas ...
-  },
-  async input => {
-    // O prompt foi atualizado para ser muito mais explícito.
-    const prompt = `Você é um especialista em marketing...
-**Processo Obrigatório:**
-1. Analise o tópico: "${input.topic}".
-2. Use a ferramenta 'googleSearchTool' para obter contexto, fatos interessantes...
-3. Com base nos resultados da busca, escreva uma legenda...`;
-
-    // Executa o modelo de IA, fornecendo a ferramenta de busca.
-    const result = await ai.generate({
-      prompt: prompt,
-      model: 'googleai/gemini-2.5-flash', // Um modelo capaz de usar ferramentas
-      tools: [googleSearchTool], // Aqui está a mágica: damos a ferramenta ao agente!
-      output: { schema: CaptionOutputSchema },
-    });
-
-    return result.output!;
-  }
-);
-```
--   **Explicação do Padrão:** Cada um dos nossos agentes (legenda, hashtags, prompt de imagem) agora tem um `prompt` que instrui o modelo de IA a **obrigatoriamente** usar a `googleSearchTool` para pesquisar sobre o tópico. Ao chamar `ai.generate`, passamos a `googleSearchTool` no array de `tools`. Isso dá superpoderes aos nossos agentes, permitindo que eles gerem conteúdo baseado em informações "frescas" da web (mesmo que simuladas por enquanto).
-
+1.  **Agente de Legenda (`generate-instagram-caption.ts`)**: Especialista em criar textos cativantes com uma chamada para ação.
+2.  **Agente de Hashtags (`suggest-relevant-hashtags.ts`)**: Especialista em marketing, focado em sugerir as melhores hashtags para alcance.
+3.  **Agente de Prompt de Imagem (`generate-gemini-nano-prompt.ts`)**: Um engenheiro de prompt sênior que cria prompts de imagem detalhados e seguros.
+4.  **Agente de Conteúdo (`content-agent-flow.ts`)**: O orquestrador que coordena todos os outros agentes para gerar o pacote de conteúdo completo.
 
 #### `src/ai/flows/content-agent-flow.ts` (O Agente Chefe)
 
-O orquestrador foi simplificado. Em vez de gerenciar várias ferramentas, ele agora chama cada agente especializado em paralelo e aguarda os resultados.
+O orquestrador chama cada agente especializado em paralelo e aguarda os resultados para montar a resposta final.
 
 ```typescript
 'use server';
@@ -187,7 +111,7 @@ export async function generatePostContent(
   const [captionResult, hashtagResult, imagePromptResult] = await Promise.all([
     generateCaption({ topic: input.postTopic }),
     suggestHashtags({ topic: input.postTopic }),
-    generateImagePrompt({ topic: input.postTopic }), // Chama a função exportada do fluxo de imagem
+    generateImagePrompt({ topic: input.postTopic }),
   ]);
 
   return {
@@ -332,7 +256,7 @@ Aqui detalhamos os componentes que criamos especificamente para o PostIA.
 -   **`postia-form.tsx`**: Este é o coração da interação com o usuário.
     -   **Tecnologias:** Usamos `react-hook-form` para gerenciar o estado do formulário de forma eficiente e `zod` com `@hookform/resolvers/zod` para criar um esquema de validação robusto. Isso garante que o usuário não possa enviar um tópico vazio ou muito curto, por exemplo.
     -   **Props (Propriedades):** Ele recebe duas props da página principal: `onSubmit` (a função que será chamada quando o formulário for enviado com sucesso) e `isLoading` (um booleano que nos diz se a IA está processando).
-    -   **Funcionalidade:** Quando o botão "Gerar Conteúdo Mágico" é clicado, `react-hook-form` valida os dados. Se forem válidos, ele chama a função `onSubmit` passando o tópico. A prop `isLoading` é usada para desabilitar o botão e mostrar um ícone de carregamento (`Loader2`), prevenindo envios duplicados e dando feedback visual ao usuário.
+    -   **Funcionalidade:** Quando o botão "Gerar Conteúdo Mágico" é clicado, `react-hook-form` valida os dados. Se forem válidos, ele chama a função `onSubmit` passing o tópico. A prop `isLoading` é usada para desabilitar o botão e mostrar um ícone de carregamento (`Loader2`), prevenindo envios duplicados e dando feedback visual ao usuário.
     -   **Explicação Detalhada do Estilo (Classes Tailwind):**
         -   Na tag `<form>`:
             -   `space-y-6`: Adiciona um espaço vertical (`space-y`) de tamanho `6` entre todos os elementos filhos diretos do formulário (o campo de input e o botão), criando um ritmo visual agradável e consistente sem precisar adicionar margens a cada elemento individualmente.
