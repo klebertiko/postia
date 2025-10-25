@@ -256,11 +256,27 @@ export default function Home() {
     -   `useState` é um "gancho" (hook) do React para guardar informações que mudam, como o conteúdo gerado (`generatedContent`) e o estado de carregamento (`isLoading`).
     -   `handleFormSubmit` é a função que orquestra a interação: define o carregamento, chama a IA através da `generateContentAction`, e atualiza a tela com o resultado ou um erro.
 
--   **Explicação do Estilo (Classes Tailwind):**
-    -   `flex min-h-screen w-full flex-col`: Estamos usando Flexbox para organizar a página. `flex-col` empilha os elementos verticalmente. `min-h-screen` garante que o contêiner principal ocupe pelo menos 100% da altura da tela, e `w-full` que ocupe 100% da largura. Isso faz com que o rodapé fique no final da página, mesmo em telas com pouco conteúdo.
-    -   `container mx-auto px-4`: `container` é uma classe do Tailwind que centraliza o conteúdo e define uma largura máxima. `mx-auto` centraliza o container horizontalmente, e `px-4` adiciona um espaçamento (`padding`) horizontal para que o conteúdo não cole nas bordas da tela.
-    -   `text-center mb-8 md:mb-12`: `text-center` alinha o texto ao centro. `mb-8` adiciona uma margem inferior (`margin-bottom`), e `md:mb-12` é um **modificador responsivo**: em telas de tamanho médio (`md`) ou maiores, a margem será maior (`12` em vez de `8`), criando um layout mais arejado em telas grandes.
-    -   `font-headline text-4xl sm:text-5xl`: `font-headline` aplica nossa fonte customizada 'Poppins'. `text-4xl` define um tamanho de fonte grande, e `sm:text-5xl` a torna ainda maior em telas pequenas (`sm`) e acima, garantindo boa legibilidade em qualquer dispositivo.
+-   **Explicação Detalhada do Estilo (Classes Tailwind):**
+    -   No elemento `<div>` principal:
+        -   `flex`: Transforma o `div` em um container flexbox. É a base para alinhamento e distribuição de espaço.
+        -   `min-h-screen`: Garante que o `div` tenha, no mínimo, a altura total da tela (`100vh`). Isso é útil para que o rodapé fique no final da página, mesmo em telas com pouco conteúdo.
+        -   `w-full`: Faz o `div` ocupar 100% da largura disponível.
+        -   `flex-col`: Define a direção do flexbox para vertical. Os itens filhos (header, main, footer) serão empilhados um sobre o outro.
+    -   No elemento `<main>`:
+        -   `flex-1`: Em um container flex, esta classe diz ao elemento para "crescer" e ocupar todo o espaço vertical disponível que não foi ocupado por outros elementos (como o header e o footer).
+        -   `container`: Uma classe especial do Tailwind que centraliza o conteúdo e define uma largura máxima, evitando que o conteúdo se estique demais em telas muito largas.
+        -   `mx-auto`: Define a margem horizontal para `auto`, o que efetivamente centraliza o bloco na tela.
+        -   `px-4 sm:px-6 lg:px-8`: Define o `padding` (espaçamento interno) horizontal. `px-4` é o padrão. `sm:px-6` significa que em telas pequenas (`small`) e maiores, o padding aumenta para `6`. `lg:px-8` aumenta ainda mais em telas grandes (`large`). Isso é **design responsivo**: o espaçamento se adapta ao tamanho da tela.
+        -   `py-8 md:py-12`: Similar ao anterior, mas para o `padding` vertical (`y`).
+    -   No elemento `<header>`:
+        -   `text-center`: Centraliza todo o texto dentro dele.
+        -   `mb-8 md:mb-12`: Define a `margin-bottom` (margem inferior) para `8` por padrão, e `12` em telas médias (`medium`) ou maiores, criando mais espaço em telas grandes.
+    -   No `<h1>` (título "PostIA"):
+        -   `font-headline`: Aplica nossa fonte customizada 'Poppins', que definimos no `tailwind.config.ts`.
+        -   `text-4xl sm:text-5xl md:text-6xl`: Define o tamanho da fonte. `4xl` é o padrão. Ele aumenta para `5xl` em telas pequenas e para `6xl` em telas médias, tornando o título impactante em qualquer dispositivo.
+        -   `font-bold`: Aplica a espessura de fonte "bold" (negrito).
+        -   `tracking-tight`: Diminui o espaçamento entre as letras, deixando o título mais compacto.
+        -   `text-primary`: Aplica nossa cor primária (roxa) ao texto, definida no `globals.css`.
 
 #### `src/app/actions.ts` (A Ponte para a IA)
 
@@ -317,21 +333,40 @@ Aqui detalhamos os componentes que criamos especificamente para o PostIA.
     -   **Tecnologias:** Usamos `react-hook-form` para gerenciar o estado do formulário de forma eficiente e `zod` com `@hookform/resolvers/zod` para criar um esquema de validação robusto. Isso garante que o usuário não possa enviar um tópico vazio ou muito curto, por exemplo.
     -   **Props (Propriedades):** Ele recebe duas props da página principal: `onSubmit` (a função que será chamada quando o formulário for enviado com sucesso) e `isLoading` (um booleano que nos diz se a IA está processando).
     -   **Funcionalidade:** Quando o botão "Gerar Conteúdo Mágico" é clicado, `react-hook-form` valida os dados. Se forem válidos, ele chama a função `onSubmit` passando o tópico. A prop `isLoading` é usada para desabilitar o botão e mostrar um ícone de carregamento (`Loader2`), prevenindo envios duplicados e dando feedback visual ao usuário.
-    -   **Estilo (Classes Tailwind):**
-        -   `space-y-6`: Adiciona um espaço vertical uniforme entre todos os elementos filhos diretos do formulário (o campo de input e o botão), criando um ritmo visual agradável.
-        -   `flex justify-end`: Transforma o contêiner do botão em um container flexbox e alinha seu conteúdo (`Button`) à direita (`justify-end`).
-        -   `animate-spin`: Classe utilitária do Tailwind que aplica uma animação de rotação contínua. Nós a usamos no ícone `Loader2` para indicar claramente que algo está acontecendo.
-        -   `hover:bg-primary/90`: Um modificador de estado. Ele diz: "quando o mouse estiver sobre este elemento (`hover:`), aplique a classe `bg-primary/90` (a cor de fundo primária com 90% de opacidade)". Isso cria o efeito visual de feedback quando o usuário passa o mouse sobre o botão.
+    -   **Explicação Detalhada do Estilo (Classes Tailwind):**
+        -   Na tag `<form>`:
+            -   `space-y-6`: Adiciona um espaço vertical (`space-y`) de tamanho `6` entre todos os elementos filhos diretos do formulário (o campo de input e o botão), criando um ritmo visual agradável e consistente sem precisar adicionar margens a cada elemento individualmente.
+        -   No `div` do botão:
+            -   `flex`: Transforma o `div` em um container flexbox.
+            -   `justify-end`: Alinha o conteúdo do flexbox (o `Button`) ao final (à direita, em um layout horizontal). Isso coloca o botão no canto direito do formulário.
+        -   No componente `<Button>`:
+            -   `disabled={isLoading}`: Uma prop que desabilita o botão se `isLoading` for `true`. O Tailwind tem estilos padrão para o estado `disabled:`, como `disabled:opacity-50` (deixa o botão semitransparente), que são aplicados automaticamente.
+            -   `size="lg"`: Uma variante do nosso componente de botão que o torna um pouco maior (`large`), dando-lhe mais destaque como a ação principal do formulário.
+            -   `bg-primary`: Define a cor de fundo (`background`) para a nossa cor primária.
+            -   `hover:bg-primary/90`: Um **modificador de estado**. Ele diz: "quando o mouse estiver sobre este elemento (`hover:`), aplique a classe `bg-primary/90` (a cor de fundo primária com 90% de opacidade)". Isso cria um efeito visual sutil de feedback.
+        -   No ícone `<Loader2>`:
+            -   `mr-2`: Adiciona uma `margin-right` (margem à direita) de tamanho `2`, criando um espaço entre o ícone e o texto "Gerando...".
+            -   `h-5 w-5`: Define a altura (`height`) e a largura (`width`) do ícone para `5`.
+            -   `animate-spin`: Classe utilitária do Tailwind que aplica uma animação de rotação contínua (keyframes `spin`). Nós a usamos para indicar claramente que algo está acontecendo.
 
 -   **`generated-content.tsx`**: Este componente é responsável por exibir os resultados da IA de forma clara e organizada.
     -   **Props:** Ele recebe uma única prop, `content`, que é um objeto contendo a legenda (`caption`), as hashtags (`hashtags`) e o prompt de imagem (`prompt`) gerados.
     -   **Estrutura:** O conteúdo é dividido em três seções, cada uma dentro de um componente `ContentCard` customizado. Isso torna o layout modular e fácil de ler.
-    -   **Estilo (Classes Tailwind):**
-        -   `space-y-8`: Similar ao `space-y-6` do formulário, mas com um espaço maior para separar visualmente cada `ContentCard`.
-        -   `animate-in fade-in-50 duration-500`: Um conjunto de classes de animação. Quando o componente aparece, ele terá um efeito de "fade-in" (aparecer suavemente) com uma duração de 500ms.
-        -   `flex flex-wrap gap-2`: Usado no contêiner das hashtags. `flex-wrap` permite que as hashtags quebrem para a próxima linha se não couberem todas em uma só. `gap-2` adiciona um pequeno espaço entre cada hashtag.
-        -   `whitespace-pre-wrap`: Uma classe muito útil! Ela diz ao navegador para respeitar as quebras de linha e os espaços que vêm do texto da legenda gerada pela IA, exibindo a formatação exatamente como foi criada.
-        -   `font-mono`: Aplica uma fonte monoespaçada ao prompt de imagem, dando a ele uma aparência de "código" ou texto técnico, o que é apropriado.
+    -   **Explicação Detalhada do Estilo (Classes Tailwind):**
+        -   No `div` principal:
+            -   `space-y-8`: Similar ao `space-y-6` do formulário, mas com um espaço vertical maior para separar visualmente cada `ContentCard`.
+            -   `animate-in fade-in-50 duration-500`: Um conjunto de classes de animação do `tailwindcss-animate`. Quando o componente aparece na tela, ele terá um efeito de "fade-in" (aparecer suavemente, começando com 50% de opacidade) com uma duração de 500 milissegundos.
+        -   No `div` das hashtags:
+            -   `flex`: Transforma o `div` em um container flexbox.
+            -   `flex-wrap`: Permite que os itens flex (as hashtags) quebrem para a próxima linha se não couberem todas em uma só. Essencial para responsividade.
+            -   `gap-2`: Adiciona um pequeno espaço (gap) de tamanho `2` entre cada item do flexbox (cada hashtag), tanto horizontal quanto verticalmente.
+        -   No `<p>` da legenda (`caption`):
+            -   `whitespace-pre-wrap`: Uma classe utilitária muito importante! Ela diz ao navegador para respeitar as quebras de linha (`\n`) e os espaços múltiplos que vêm do texto da legenda gerado pela IA. Sem isso, uma legenda com múltiplos parágrafos seria exibida como uma única linha contínua.
+        -   No `<p>` do prompt de imagem:
+            -   `font-mono`: Aplica uma fonte monoespaçada ao prompt, dando a ele uma aparência de "código" ou texto técnico, o que é apropriado para um prompt de IA.
+            -   `bg-muted`: Define o fundo para a nossa cor "muted", criando um bloco de cor que destaca o prompt.
+            -   `rounded-md`: Aplica bordas arredondadas de tamanho médio (`medium`).
+            -   `p-3`: Adiciona um `padding` (espaçamento interno) de tamanho `3` em todos os lados.
 
 -   **`copy-button.tsx`**: Um pequeno mas poderoso componente de usabilidade.
     -   **Funcionalidade:** Ele recebe uma prop `textToCopy`. Ao ser clicado, ele usa a API do navegador `navigator.clipboard.writeText()` para copiar o texto para a área de transferência do usuário.
