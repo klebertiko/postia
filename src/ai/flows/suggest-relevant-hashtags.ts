@@ -27,40 +27,41 @@ const HashtagOutputSchema = z.object({
 });
 export type HashtagOutput = z.infer<typeof HashtagOutputSchema>;
 
-// Função de invólucro (wrapper) que será chamada por outros agentes.
-export async function suggestHashtags(
-  input: HashtagInput
-): Promise<HashtagOutput> {
-  return hashtagSuggesterFlow(input);
-}
+// Define o prompt reutilizável para o agente de hashtags.
+const hashtagSuggester = ai.definePrompt({
+  name: 'hashtagSuggester',
+  input: { schema: HashtagInputSchema },
+  output: { schema: HashtagOutputSchema },
+  prompt: `Você é um especialista em marketing de SEO e mídia social para o Instagram.
+Sua tarefa é sugerir uma lista de hashtags relevantes e eficazes para o tópico: "{{topic}}".
 
-// Define o fluxo do agente.
-export const hashtagSuggesterFlow = ai.defineFlow(
+**Processo Obrigatório:**
+1. Crie uma lista de hashtags. Combine hashtags populares com hashtags de nicho para maximizar o alcance.
+2. Não inclua o caractere '#' na resposta.
+
+Gere a lista de hashtags AGORA.`,
+});
+
+// Define o fluxo que utiliza o prompt.
+const hashtagSuggesterFlow = ai.defineFlow(
   {
     name: 'hashtagSuggesterFlow',
     inputSchema: HashtagInputSchema,
     outputSchema: HashtagOutputSchema,
   },
   async input => {
-    // Define o prompt que será enviado ao modelo de IA.
-    const prompt = `Você é um especialista em marketing de SEO e mídia social para o Instagram.
-Sua tarefa é sugerir uma lista de hashtags relevantes e eficazes para o tópico: "${input.topic}".
-
-**Processo Obrigatório:**
-1. Crie uma lista de hashtags. Combine hashtags populares com hashtags de nicho para maximizar o alcance.
-2. Não inclua o caractere '#' na resposta.
-
-Gere a lista de hashtags AGORA.`;
-
-    // Executa o modelo de IA.
-    const result = await ai.generate({
-      prompt: prompt,
-      model: 'googleai/gemini-2.5-flash',
-      output: {
-        schema: HashtagOutputSchema,
-      },
-    });
-
-    return result.output!;
+    const { output } = await hashtagSuggester(input);
+    return output!;
   }
 );
+
+/**
+ * Função de invólucro (wrapper) que será chamada por outros agentes.
+ * @param input O tópico para as hashtags.
+ * @returns Uma lista de hashtags.
+ */
+export async function suggestHashtags(
+  input: HashtagInput
+): Promise<HashtagOutput> {
+  return hashtagSuggesterFlow(input);
+}

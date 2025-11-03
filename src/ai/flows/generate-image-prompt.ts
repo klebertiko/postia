@@ -27,24 +27,13 @@ const ImagePromptOutputSchema = z.object({
 });
 export type ImagePromptOutput = z.infer<typeof ImagePromptOutputSchema>;
 
-// Função de invólucro (wrapper) que será chamada por outros agentes.
-export async function generateImagePrompt(
-  input: ImagePromptInput
-): Promise<ImagePromptOutput> {
-  return imagePromptFlow(input);
-}
-
-// Define o fluxo do agente.
-const imagePromptFlow = ai.defineFlow(
-  {
-    name: 'imagePromptGeneratorFlow',
-    inputSchema: ImagePromptInputSchema,
-    outputSchema: ImagePromptOutputSchema,
-  },
-  async input => {
-    // Define o prompt para o agente de prompt.
-    const prompt = `Você é um Engenheiro de Prompt Sênior.
-Sua tarefa é criar um prompt de imagem detalhado e seguro em português do Brasil para o tópico: "${input.topic}".
+// Define o prompt reutilizável para o agente de prompt de imagem.
+const imagePromptGenerator = ai.definePrompt({
+  name: 'imagePromptGenerator',
+  input: { schema: ImagePromptInputSchema },
+  output: { schema: ImagePromptOutputSchema },
+  prompt: `Você é um Engenheiro de Prompt Sênior.
+Sua tarefa é criar um prompt de imagem detalhado e seguro em português do Brasil para o tópico: "{{topic}}".
 
 **Requisitos Obrigatórios:**
 1.  **Segurança e Apropriação:** Garanta que todos os elementos visuais sejam seguros, apropriados e factualmente corretos para o contexto.
@@ -61,17 +50,29 @@ Formule o prompt como uma única linha de texto em português do Brasil, separan
 6.  **Detalhes Adicionais (Verificados):** Adicione os elementos específicos e comprovadamente seguros.
 7.  **Negativos:** Liste de forma geral os elementos a serem evitados para garantir a segurança.
 
-Gere o prompt final AGORA.`;
+Gere o prompt final AGORA.`,
+});
 
-    // Executa o modelo de IA.
-    const result = await ai.generate({
-      prompt: prompt,
-      model: 'googleai/gemini-2.5-flash',
-      output: {
-        schema: ImagePromptOutputSchema,
-      },
-    });
-
-    return result.output!;
+// Define o fluxo que utiliza o prompt.
+const imagePromptFlow = ai.defineFlow(
+  {
+    name: 'imagePromptGeneratorFlow',
+    inputSchema: ImagePromptInputSchema,
+    outputSchema: ImagePromptOutputSchema,
+  },
+  async input => {
+    const { output } = await imagePromptGenerator(input);
+    return output!;
   }
 );
+
+/**
+ * Função de invólucro (wrapper) que será chamada por outros agentes.
+ * @param input O tópico para o prompt de imagem.
+ * @returns O prompt de imagem gerado.
+ */
+export async function generateImagePrompt(
+  input: ImagePromptInput
+): Promise<ImagePromptOutput> {
+  return imagePromptFlow(input);
+}

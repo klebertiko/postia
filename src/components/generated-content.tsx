@@ -1,21 +1,27 @@
-import type { GeneratedContent as GeneratedContentType } from '@/lib/types';
+import type {
+  GeneratedContent as GeneratedContentType,
+  ImageGenerator,
+} from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CopyButton } from '@/components/copy-button';
 import { Captions, Hash, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { Button } from './ui/button';
 
+const IMAGE_GENERATORS: ImageGenerator[] = [
+  { name: 'Gemini', url: 'https://gemini.google.com/' },
+  {
+    name: 'Microsoft Designer',
+    url: 'https://designer.microsoft.com/image-creator',
+  },
+];
+
 interface GeneratedContentProps {
   content: GeneratedContentType;
 }
 
-const imageGenerators = [
-  { name: 'Gemini', url: 'https://gemini.google.com/' },
-  { name: 'Microsoft Designer', url: 'https://designer.microsoft.com/image-creator' },
-];
-
 export function GeneratedContent({ content }: GeneratedContentProps) {
-  const { caption, hashtags, prompt } = content;
+  const { caption, hashtags, imagePrompt } = content;
 
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-500">
@@ -33,7 +39,7 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
         textToCopy={hashtags.map(h => `#${h}`).join(' ')}
       >
         <div className="flex flex-wrap gap-2">
-          {hashtags.map((tag) => (
+          {hashtags.map(tag => (
             <Badge key={tag} variant="secondary" className="font-normal">
               #{tag}
             </Badge>
@@ -44,26 +50,35 @@ export function GeneratedContent({ content }: GeneratedContentProps) {
       <ContentCard
         title="Prompt para Geração de Imagem"
         icon={<ImageIcon className="h-5 w-5 text-muted-foreground" />}
-        textToCopy={prompt}
+        textToCopy={imagePrompt}
       >
         <p className="font-mono text-sm bg-muted rounded-md p-3 text-card-foreground/90">
-          {prompt}
+          {imagePrompt}
         </p>
         <div className="mt-4">
-            <h4 className="text-sm font-semibold text-muted-foreground mb-3">
-              Experimente seu prompt nestas plataformas:
-            </h4>
-            <div className="flex flex-col sm:flex-row gap-3">
-              {imageGenerators.map((generator) => (
-                <Button key={generator.name} asChild variant="outline" className="justify-start">
-                  <a href={generator.url} target="_blank" rel="noopener noreferrer">
-                    {generator.name}
-                    <ExternalLink className="ml-auto h-4 w-4 text-muted-foreground" />
-                  </a>
-                </Button>
-              ))}
-            </div>
+          <h4 className="text-sm font-semibold text-muted-foreground mb-3">
+            Experimente seu prompt nestas plataformas:
+          </h4>
+          <div className="flex flex-col sm:flex-row gap-3">
+            {IMAGE_GENERATORS.map(generator => (
+              <Button
+                key={generator.name}
+                asChild
+                variant="outline"
+                className="justify-start"
+              >
+                <a
+                  href={generator.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {generator.name}
+                  <ExternalLink className="ml-auto h-4 w-4 text-muted-foreground" />
+                </a>
+              </Button>
+            ))}
           </div>
+        </div>
       </ContentCard>
     </div>
   );

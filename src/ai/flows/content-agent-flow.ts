@@ -10,13 +10,13 @@
  * - GeneratePostContentInput - O tipo de entrada para a função.
  * - GeneratePostContentOutput - O tipo de retorno da função.
  */
-import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 // Importa as funções exportadas dos fluxos especializados.
 import { generateCaption } from './generate-post-caption';
 import { suggestHashtags } from './suggest-relevant-hashtags';
 import { generateImagePrompt } from './generate-image-prompt';
+import type { GeneratePostContentOutput } from '@/lib/types';
 
 // Esquema de entrada para o fluxo principal: o tópico do post.
 const GeneratePostContentInputSchema = z.object({
@@ -26,29 +26,23 @@ export type GeneratePostContentInput = z.infer<
   typeof GeneratePostContentInputSchema
 >;
 
-// Esquema de saída do fluxo principal: o conteúdo completo do post.
-const GeneratePostContentOutputSchema = z.object({
-  caption: z.string().describe('A legenda gerada para o post.'),
-  hashtags: z
-    .array(z.string())
-    .describe('A lista de hashtags sugeridas para o post.'),
-  imagePrompt: z.string().describe('O prompt de imagem gerado para o post.'),
-});
-export type GeneratePostContentOutput = z.infer<
-  typeof GeneratePostContentOutputSchema
->;
-
-// Função de invólucro (wrapper) que será chamada pela nossa aplicação.
+/**
+ * Função orquestradora que coordena os agentes de IA para gerar o conteúdo completo do post.
+ * @param input O objeto de entrada contendo o tópico do post.
+ * @returns Uma promessa que resolve para o conteúdo completo do post (legenda, hashtags e prompt de imagem).
+ */
 export async function generatePostContent(
   input: GeneratePostContentInput
 ): Promise<GeneratePostContentOutput> {
-  // Chama os agentes em paralelo para otimizar o tempo de resposta.
+  // Chama os agentes especializados em paralelo para otimizar o tempo de resposta.
+  // Promise.all executa todas as promessas simultaneamente.
   const [captionResult, hashtagResult, imagePromptResult] = await Promise.all([
     generateCaption({ topic: input.postTopic }),
     suggestHashtags({ topic: input.postTopic }),
     generateImagePrompt({ topic: input.postTopic }),
   ]);
 
+  // Retorna um objeto consolidado com os resultados de cada agente.
   return {
     caption: captionResult.caption,
     hashtags: hashtagResult.hashtags,
