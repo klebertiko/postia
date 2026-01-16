@@ -45,24 +45,23 @@ export default function RootLayout({
     <html lang="pt-BR" className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap"
           rel="stylesheet"
         />
+      </head>
+      <body className="font-body antialiased">
+        {children}
+        <Toaster />
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
           <Script
             id="adsense-script"
-            async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
             crossOrigin="anonymous"
             strategy="afterInteractive"
           />
         )}
-      </head>
-      <body className="font-body antialiased">
-        {children}
-        <Toaster />
       </body>
     </html>
   );

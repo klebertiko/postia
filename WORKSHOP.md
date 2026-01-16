@@ -264,7 +264,7 @@ Aqui detalhamos os componentes que criamos especificamente para o PostIA.
             -   `flex`: Transforma o `div` em um container flexbox.
             -   `justify-end`: Alinha o conteúdo do flexbox (o `Button`) ao final (à direita, em um layout horizontal). Isso coloca o botão no canto direito do formulário.
         -   No componente `<Button>`:
-            -   `disabled={isLoading}`: Uma prop que desabilita o botão se `isLoading` for `true`. O Tailwind tem estilos padrão para o estado `disabled:`, como `disabled:opacity-50` (deixa o botão semitransparente), que são aplicados automaticamente.
+            -   `disabled={isLoading}`: Uma prop que desabilita o botão se `isLoading` for `true`. O Tailwind ham estilos padrão para o estado `disabled:`, como `disabled:opacity-50` (deixa o botão semitransparente), que são aplicados automaticamente.
             -   `size="lg"`: Uma variante do nosso componente de botão que o torna um pouco maior (`large`), dando-lhe mais destaque como a ação principal do formulário.
             -   `bg-primary`: Define a cor de fundo (`background`) para a nossa cor primária.
             -   `hover:bg-primary/90`: Um **modificador de estado**. Ele diz: "quando o mouse estiver sobre este elemento (`hover:`), aplique a classe `bg-primary/90` (a cor de fundo primária com 90% de opacidade)". Isso cria um efeito visual sutil de feedback.

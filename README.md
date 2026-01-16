@@ -13,6 +13,7 @@ Este `README` irá guiá-lo para configurar, executar e fazer o deploy do projet
 -   **Links para Geradores de Imagem:** Após gerar um prompt de imagem, o app fornece links diretos para plataformas como o Gemini para você poder criar sua imagem instantaneamente.
 -   **Interface Moderna e Responsiva:** Construído com Next.js, React, Tailwind CSS e shadcn/ui.
 -   **Progressive Web App (PWA):** O aplicativo pode ser instalado em dispositivos móveis e desktops para uma experiência nativa.
+-   **Monetização com Google AdSense:** Preparado para exibir anúncios e gerar receita.
 
 ## 🛠️ Tecnologias Utilizadas
 
