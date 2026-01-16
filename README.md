@@ -56,11 +56,13 @@ Para que a IA funcione, você precisa de uma chave de API do Google Gemini.
     ```
 
 3.  **Crie o arquivo de ambiente:**
-    Crie um novo arquivo chamado `.env` na raiz do projeto e adicione sua chave de API:
+    Crie um novo arquivo chamado `.env` na raiz do projeto e adicione suas chaves de ambiente:
     ```.env
     GEMINI_API_KEY=SUA_CHAVE_DE_API_AQUI
+    NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-SEU_ID_DE_CLIENTE_AQUI
     ```
-    Substitua `SUA_CHAVE_DE_API_AQUI` pela chave que você obteve no Google AI Studio.
+    - Substitua `SUA_CHAVE_DE_API_AQUI` pela chave que você obteve no Google AI Studio.
+    - Opcional: Substitua `ca-pub-SEU_ID_DE_CLIENTE_AQUI` pelo seu ID de cliente do Google AdSense para habilitar os anúncios.
 
 ### 4. Execute a Aplicação Localmente
 
@@ -85,14 +87,14 @@ Fazer o deploy do PostIA é um processo simples com a Vercel.
 
 ### 2. Configure o Projeto
 
-A Vercel detectará automaticamente que é um projeto Next.js e usará as configurações corretas. A única etapa manual é configurar a variável de ambiente.
+A Vercel detectará automaticamente que é um projeto Next.js e usará as configurações corretas. A única etapa manual é configurar as variáveis de ambiente.
 
 1.  Dentro das configurações do seu projeto na Vercel, vá para a aba "**Settings**" -> "**Environment Variables**".
-2.  Adicione uma nova variável de ambiente:
-    -   **Name:** `GEMINI_API_KEY`
-    -   **Value:** Cole a chave de API que você obteve do Google AI Studio.
-3.  Certifique-se de que a variável **não esteja** marcada como "Exposed to the client". Ela deve ser usada apenas no lado do servidor.
-4.  Salve e clique em "**Deploy**".
+2.  Adicione as seguintes variáveis:
+    -   **`GEMINI_API_KEY`**: Cole a chave de API que você obteve do Google AI Studio. Certifique-se de que a variável **não esteja** marcada como "Exposed to the client".
+    -   **`NEXT_PUBLIC_ADSENSE_CLIENT_ID`**: (Opcional) Cole o seu ID de Cliente do Google AdSense (ex: `ca-pub-123456789...`). Como ela começa com `NEXT_PUBLIC_`, a Vercel a disponibilizará para o cliente automaticamente.
+3.  Salve as variáveis.
+4.  Clique em "**Deploy**" para publicar sua aplicação com as novas configurações.
 
 A Vercel cuidará de todo o processo de build e deploy. Em poucos minutos, seu PostIA estará online e acessível globalmente!
 

@@ -50,13 +50,15 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap"
           rel="stylesheet"
         />
-        <Script
+        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+          <Script
             id="adsense-script"
             async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_CLIENT_ID"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
             crossOrigin="anonymous"
             strategy="afterInteractive"
-        />
+          />
+        )}
       </head>
       <body className="font-body antialiased">
         {children}

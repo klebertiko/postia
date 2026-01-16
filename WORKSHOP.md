@@ -53,7 +53,7 @@ Esses arquivos definem a estrutura e as dependências do nosso projeto.
 **Em resumo: `tailwind.config.ts` define os NOMES e as ABSTRAÇÕES, e `globals.css` define os VALORES REAIS dessas abstrações. Eles são inseparáveis e essenciais.**
 
 -   **`next.config.ts`**: Configurações específicas do Next.js. Adicionamos a configuração do PWA (`@ducanh2912/next-pwa`) para tornar nosso app instalável.
--   **`.env`**: Este arquivo **não é enviado** para o repositório (por segurança!). Ele armazena "segredos", como a nossa `GEMINI_API_KEY`. O arquivo `src/ai/genkit.ts` lê essa chave para que a IA possa funcionar no ambiente de desenvolvimento local.
+-   **`.env`**: Este arquivo **não é enviado** para o repositório (por segurança!). Ele armazena "segredos" e configurações de ambiente, como a nossa `GEMINI_API_KEY` (para a IA) e a `NEXT_PUBLIC_ADSENSE_CLIENT_ID` (para os anúncios). O Next.js e o Genkit leem essas chaves para configurar os serviços correspondentes. Variáveis que começam com `NEXT_PUBLIC_` são expostas de forma segura para o código do navegador.
 
 
 ### 2. A Arquitetura de IA com Genkit (`src/ai/...`)
@@ -320,16 +320,19 @@ A Vercel é a plataforma criada pelos mesmos desenvolvedores do Next.js, tornand
 2.  Encontre e importe o repositório do seu PostIA.
 3.  A Vercel vai reconhecer que é um projeto Next.js e preencher a maioria das configurações. A única coisa que precisamos fazer é adicionar nossa chave de API.
 
-#### Passo 3: Adicionando a Variável de Ambiente
+#### Passo 3: Adicionando as Variáveis de Ambiente
 
-Esta é a etapa mais importante. Precisamos informar à Vercel qual é a nossa `GEMINI_API_KEY` de forma segura.
+Esta é a etapa mais importante. Precisamos informar à Vercel quais são nossas chaves de API de forma segura.
 
 1.  Nas configurações do projeto na Vercel, encontre a aba "**Settings**" e depois clique em "**Environment Variables**".
-2.  Crie uma nova variável com os seguintes dados:
-    -   **Name:** `GEMINI_API_KEY`
-    -   **Value:** `SUA_CHAVE_DE_API_AQUI` (cole a mesma chave que você usou no arquivo `.env` local).
-3.  **Importante:** Deixe a variável com o tipo padrão ("Secret"), garantindo que ela não fique exposta no código do cliente.
-4.  Salve a variável.
+2.  Crie as seguintes variáveis:
+    -   **`GEMINI_API_KEY`**:
+        -   **Value:** `SUA_CHAVE_DE_API_AQUI` (cole a mesma chave que você usou no arquivo `.env` local).
+        -   **Importante:** Deixe esta variável com o tipo padrão ("Secret"), garantindo que ela não fique exposta no código do cliente.
+    -   **`NEXT_PUBLIC_ADSENSE_CLIENT_ID`**:
+        -   **Value:** `ca-pub-SEU_ID_DE_CLIENTE_AQUI` (cole seu ID de cliente do AdSense).
+        -   **Importante:** Como o nome começa com `NEXT_PUBLIC_`, a Vercel automaticamente a tornará disponível para o código no navegador, o que é necessário para o script do AdSense funcionar.
+3.  Salve as variáveis.
 
 #### Passo 4: Deploy!
 
