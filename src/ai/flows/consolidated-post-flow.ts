@@ -37,9 +37,9 @@ export const consolidatedPostFlow = ai.defineFlow(
     async (input: ConsolidatedInput) => {
         // Definimos o prompt para gerar tanto o texto estruturado quanto a imagem.
         // O modelo gemini-2.5-flash-image deve ser capaz de retornar media parts.
-        const { output, response } = await ai.generate({
-            model: 'googleai/gemini-2.5-flash',
-            input: `Gere um conteúdo completo para um post de Instagram sobre o tópico: "${input.topic}".
+        const response = await ai.generate({
+            model: 'googleai/gemini-2.5-flash-image',
+            prompt: `Gere um conteúdo completo para um post de Instagram sobre o tópico: "${input.topic}".
       
       Você deve retornar:
       1. Uma legenda (caption) envolvente e sem hashtags, terminando com um CTA.
@@ -53,6 +53,8 @@ export const consolidatedPostFlow = ai.defineFlow(
             },
         });
 
+        const output = response.output;
+
         if (!output) {
             throw new Error('Falha ao gerar conteúdo consolidado.');
         }
@@ -61,7 +63,7 @@ export const consolidatedPostFlow = ai.defineFlow(
         // Dependendo de como o Genkit lida com o Gemini gerando imagens,
         // podemos precisar procurar por partes de mídia na resposta.
         let generatedImageUrl = '';
-        if (response && response.message && response.message.content) {
+        if (response.message && response.message.content) {
             const imagePart = response.message.content.find((part: any) => part.media);
             if (imagePart && imagePart.media) {
                 generatedImageUrl = `data:${imagePart.media.contentType};base64,${imagePart.media.url}`;
