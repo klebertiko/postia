@@ -5,6 +5,7 @@ export type GeneratedContent = {
   caption: string;
   hashtags: string[];
   imagePrompt: string;
+  imageUrl?: string; // Base64 string from Gemini
 };
 
 /**

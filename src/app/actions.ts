@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import type { GeneratedContent } from '@/lib/types';
-import { generatePostContent } from '@/ai/flows/content-agent-flow';
+import { generateConsolidatedContent } from '@/ai/flows/consolidated-post-flow';
 
 const formSchema = z.object({
   postTopic: z.string().min(1, 'O tópico do post é obrigatório.'),
@@ -29,7 +29,7 @@ export async function generateContentAction(
   const { postTopic } = validation.data;
 
   try {
-    const result = await generatePostContent({ postTopic });
+    const result = await generateConsolidatedContent({ topic: postTopic });
 
     // Validação robusta da resposta da IA.
     if (!result?.caption || !result?.hashtags || !result?.imagePrompt) {
@@ -41,6 +41,7 @@ export async function generateContentAction(
         caption: result.caption,
         hashtags: result.hashtags.slice(0, MAX_HASHTAGS), // Limita as hashtags para um número razoável.
         imagePrompt: result.imagePrompt,
+        imageUrl: result.imageUrl,
       },
       error: null,
     };
